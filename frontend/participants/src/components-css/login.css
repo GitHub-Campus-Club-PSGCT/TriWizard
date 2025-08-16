@@ -1,57 +1,128 @@
-.page {
+@import url('https://fonts.googleapis.com/css2?family=Marck+Script&display=swap');
+
+/* --- Page & Map Background --- */
+.marauders-map {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #f0f0f0;
+  font-family: 'Marck Script', cursive;
+  overflow: hidden;
+  position: relative;
+  
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 300px;
+/* --- Floating UI & Step Animation --- */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.floating-ui {
+  z-index: 10;
+  animation: float 10s ease-in-out infinite;
+  width: 100%;
+  max-width: 550px;
   text-align: center;
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
+  background-color: rgba(243, 233, 216, 0.85);
+  padding: 2rem 2.5rem;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
-.title {
-  font-size: 22px;
-  margin-bottom: 15px;
-  font-weight: bold;
+.step-container {
+  animation: fadeIn 1.2s ease-out;
 }
 
-.input {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+/* --- Typography, Forms, Buttons --- */
+.title { font-family: 'Marck Script', cursive; font-size: 2.8rem; font-weight: 400; color: #3a2e20; text-shadow: 1px 1px 3px rgba(0,0,0,0.1); margin-bottom: 1rem; }
+.subtitle { font-family: 'Times New Roman', Times, serif; font-style: italic; font-size: 1.1rem; color: #5c4b37; margin-bottom: 3rem; opacity: 0.9; }
+.input { width: 90%; background: none; border: none; border-bottom: 2px solid rgba(92, 75, 55, 0.3); padding: 10px 5px; margin-bottom: 2rem; font-family: 'Marck Script', cursive; font-size: 1.5rem; color: #3a2e20; text-align: center; transition: all 0.4s ease; }
+.input::placeholder { color: rgba(92, 75, 55, 0.5); }
+.input:focus { outline: none; border-bottom-color: #3a2e20; }
+.otp-container { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; }
+.otp-input { width: 50px; height: 65px; background-color: rgba(224, 205, 170, 0.4); border: 1px solid rgba(92, 75, 55, 0.4); border-radius: 4px; font-family: 'Times New Roman', serif; font-weight: bold; font-size: 2rem; text-align: center; color: #3a2e20; transition: all 0.3s ease; }
+.otp-input:focus { outline: none; transform: scale(1.1); border-color: #3a2e20; }
+.btn { background: #3a2e20; color: #f3e9d8; border: none; border-radius: 50px; padding: 14px 40px; font-family: 'Marck Script', cursive; font-size: 1.3rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+.btn:hover { background: #5c4b37; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+
+/* --- Mischief Managed & Success Screen --- */
+@keyframes write-out { from { width: 0; } to { width: 100%; } }
+@keyframes fade-out-all { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
+.mischief-container { text-align: center; animation: fade-out-all 1s ease-in forwards; animation-delay: 2.5s; background: none; padding: 0; box-shadow: none; }
+.mischief-text { font-size: 4rem; display: inline-block; color: #3a2e20; overflow: hidden; white-space: nowrap; animation: write-out 2.5s steps(40, end); border-right: .15em solid #5c4b37; }
+@keyframes unfurl { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes glow { from { box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff; } to { box-shadow: 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #fff; } }
+.success-container { animation: fadeIn 1s ease-out; }
+.sorted-title { color: #3a2e20; font-size: 2.5rem; }
+.success-subtitle { font-size: 1.5rem !important; }
+.success-subtitle strong { color: #3a2e20; font-weight: bold; }
+.house-banners { display: flex; justify-content: center; gap: 2rem; height: 200px; margin-bottom: 2rem; }
+.banner { width: 60px; height: 100%; border: 3px solid #000; transform-origin: top; animation: unfurl 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; opacity: 0.3; filter: grayscale(80%); transition: all 0.5s ease; }
+.banner.chosen { opacity: 1; filter: grayscale(0%); transform: scale(1.1); animation: glow 1.5s ease-in-out infinite alternate; animation-delay: 1s; }
+.banner.gryffindor { background: linear-gradient(#7f0909 70%, #d3a625 70%); border-color: #d3a625; }
+.banner.slytherin { background: linear-gradient(#1a472a 70%, #aaaaaa 70%); border-color: #aaaaaa; }
+.banner.hufflepuff { background: linear-gradient(#ffc500 70%, #372e29 70%); border-color: #372e29; }
+.banner.ravenclaw { background: linear-gradient(#0e1a40 70%, #946b2d 70%); border-color: #946b2d; }
+.success-btn { animation: fadeIn 1s ease-out; animation-delay: 1s; }
+
+/* --- Golden Snitch Animation --- */
+@keyframes fly-1 {
+  0% { transform: translateX(-10vw) translateY(30vh) rotate(-10deg); }
+  100% { transform: translateX(110vw) translateY(-20vh) rotate(15deg); }
+}
+@keyframes fly-2 {
+  0% { transform: translateX(-10vw) translateY(80vh) rotate(10deg); }
+  100% { transform: translateX(110vw) translateY(10vh) rotate(-15deg); }
+}
+@keyframes fly-3 {
+  0% { transform: translateX(110vw) translateY(50vh) rotate(-5deg); }
+  100% { transform: translateX(-10vw) translateY(60vh) rotate(10deg); }
+}
+@keyframes flap {
+  0%, 100% { transform: rotate3d(0, 1, 0, 0deg); }
+  50% { transform: rotate3d(0, 1, 0, 180deg); }
+}
+@keyframes glow-snitch {
+  from { filter: drop-shadow(0 0 5px #ffeb3b); }
+  to { filter: drop-shadow(0 0 15px #fffaad); }
 }
 
-.btn {
-  width: 100%;
-  padding: 10px;
-  background: #007bff;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  font-size: 14px;
-  cursor: pointer;
+.snitch-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 90px;
+  /* --- VISIBILITY FIX: Make snitches fly IN FRONT of the UI --- */
+  z-index: 15;
+  opacity: 0.95;
+  pointer-events: none;
+}
+.snitch .body {
+  fill: #ffdc3b;
+  animation: glow-snitch 1s ease-in-out infinite alternate;
+}
+.snitch .wings {
+  /* --- VISIBILITY FIX: Made wings fully opaque --- */
+  fill: #f0e6d2; 
+  stroke: #a37f40;
+  stroke-width: 2px;
+}
+.snitch .wing {
+  animation: flap 0.15s linear infinite;
+  transform-origin: 100px 50px;
 }
 
-.btn:hover {
-  background: #0056b3;
-}
-
-.success {
-  color: green;
-  font-weight: bold;
-  font-size: 16px;
-}
-
-.msg {
-  margin-top: 10px;
-  font-size: 13px;
-  color: #555;
-}
+/* Applying different flight paths and timings */
+/* --- VISIBILITY FIX: Slowed down animations --- */
+.snitch-1 { animation: fly-1 15s linear infinite; animation-delay: 0s; }
+.snitch-2 { animation: fly-2 18s linear infinite; animation-delay: 5s; width: 60px; }
+.snitch-3 { animation: fly-3 13s linear infinite; animation-delay: 9s; width: 100px; }
