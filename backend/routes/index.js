@@ -2,47 +2,12 @@ const express = require("express");
 const router = express.Router();
 
 const adminRoutes = require("./admin");
-const emailVerificationRoutes = require("./emailVerification");
+const emailVerificationRoutes = require("./emailVerification.js");
 const loginRoutes = require("./login");
 const otpRoutes = require("./otp");
 
-// mount routes
+//mount routes
 router.use("/admin", adminRoutes);
-const express = require("express");
-const router = express.Router();
-const Team = require("../models/Team");
-
-router.post("/", async (req, res) => {
-  try {
-    const { email } = req.body;
-    console.log("Received email:", email);
-
-    if (!email || email.length < 6) {
-      return res.status(400).json({ success: false, message: "Enter a valid email" });
-    }
-
-    // Extract roll number from first 6 characters of email
-    const rollNumber = email.slice(0, 6);
-    console.log("Extracted rollNumber:", rollNumber);
-
-    // Check if roll number exists in any team's members
-    const team = await Team.findOne({ "members.rollNumber": rollNumber });
-    console.log("Query result:", team);
-
-    if (!team) {
-      return res.status(400).json({ success: false, message: "Enter a valid email" });
-    }
-
-    // Roll number is valid → redirect to OTP page
-    return res.json({ success: true, message: "Email verified", redirectTo: "/enter-otp", teamId: team.teamId, rollNumber });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
-});
-
-module.exports = router;
 router.use("/email-verification", emailVerificationRoutes);
 router.use("/login", loginRoutes);
 router.use("/otp", otpRoutes);
