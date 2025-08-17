@@ -23,8 +23,8 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ success: false, message: "Enter a valid email" });
     }
 
-    // Roll number is valid → redirect to OTP page
-    return res.json({ success: true, message: "Email verified", redirectTo: "/enter-otp", teamId: team.teamId, rollNumber });
+    // Roll nuumber is valid, proceed with email verification
+    return res.json({ success: true, message: "Email verified" });
 
   } catch (err) {
     console.error(err);
