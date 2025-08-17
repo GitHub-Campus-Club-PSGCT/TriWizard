@@ -1,128 +1,212 @@
-@import url('https://fonts.googleapis.com/css2?family=Marck+Script&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Nunito+Sans:wght@400;700&display=swap');
 
-/* --- Page & Map Background --- */
-.marauders-map {
+/* --- Global Reset for Full Screen Background --- */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* --- Base & Magical Container --- */
+.magical-container {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  font-family: 'Marck Script', cursive;
-  overflow: hidden;
-  position: relative;
-  
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  font-family: 'Nunito Sans', sans-serif;
+  background-color: #05040a;
+  background-image: radial-gradient(circle at 50% 30%, #4a0e69 0%, #05040a 75%);
 }
 
-/* --- Floating UI & Step Animation --- */
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-15px); }
-  100% { transform: translateY(0px); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.floating-ui {
-  z-index: 10;
-  animation: float 10s ease-in-out infinite;
+/* --- Animated Starry Background --- */
+.stars, .twinkling {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
-  max-width: 550px;
+  height: 100%;
+}
+.stars {
+  background: transparent url(https://www.script-tutorials.com/demos/360/images/stars.png) repeat top center;
+  z-index: 1;
+}
+@keyframes move-twink-back { from {background-position:0 0;} to {background-position:-10000px 5000px;} }
+.twinkling {
+  background: transparent url(https://www.script-tutorials.com/demos/360/images/twinkling.png) repeat top center;
+  z-index: 2;
+  animation: move-twink-back 200s linear infinite;
+}
+
+/* --- Content Wrapper --- */
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+.content-wrapper {
+  z-index: 10;
+  width: 100%;
+  max-width: 500px;
+  padding: 0 1rem;
+  box-sizing: border-box;
   text-align: center;
-  background-color: rgba(243, 233, 216, 0.85);
-  padding: 2rem 2.5rem;
-  border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.step-container {
-  animation: fadeIn 1.2s ease-out;
+.step-container { animation: fadeIn 1.2s ease-out; }
+
+/* --- Typography & Forms --- */
+.title { font-family: 'Cinzel Decorative', cursive; font-size: 3rem; font-weight: 700; color: #EAE0C8; text-shadow: 0 0 15px rgba(255, 223, 150, 0.7), 0 0 5px rgba(255, 223, 150, 0.5); margin-bottom: 0.5rem; }
+.subtitle { font-size: 1.1rem; color: #A98B5D; margin-bottom: 2.5rem; opacity: 0.9; }
+
+.magical-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem; 
 }
 
-/* --- Typography, Forms, Buttons --- */
-.title { font-family: 'Marck Script', cursive; font-size: 2.8rem; font-weight: 400; color: #3a2e20; text-shadow: 1px 1px 3px rgba(0,0,0,0.1); margin-bottom: 1rem; }
-.subtitle { font-family: 'Times New Roman', Times, serif; font-style: italic; font-size: 1.1rem; color: #5c4b37; margin-bottom: 3rem; opacity: 0.9; }
-.input { width: 90%; background: none; border: none; border-bottom: 2px solid rgba(92, 75, 55, 0.3); padding: 10px 5px; margin-bottom: 2rem; font-family: 'Marck Script', cursive; font-size: 1.5rem; color: #3a2e20; text-align: center; transition: all 0.4s ease; }
-.input::placeholder { color: rgba(92, 75, 55, 0.5); }
-.input:focus { outline: none; border-bottom-color: #3a2e20; }
-.otp-container { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; }
-.otp-input { width: 50px; height: 65px; background-color: rgba(224, 205, 170, 0.4); border: 1px solid rgba(92, 75, 55, 0.4); border-radius: 4px; font-family: 'Times New Roman', serif; font-weight: bold; font-size: 2rem; text-align: center; color: #3a2e20; transition: all 0.3s ease; }
-.otp-input:focus { outline: none; transform: scale(1.1); border-color: #3a2e20; }
-.btn { background: #3a2e20; color: #f3e9d8; border: none; border-radius: 50px; padding: 14px 40px; font-family: 'Marck Script', cursive; font-size: 1.3rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-.btn:hover { background: #5c4b37; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+.input { background: transparent; border: none; border-bottom: 2px solid rgba(200, 159, 90, 0.3); width: 100%; padding: 12px 10px; color: #FDF6E3; font-size: 1.2rem; text-align: center; transition: all 0.4s ease; box-sizing: border-box; }
+.input::placeholder { color: rgba(169, 139, 93, 0.5); }
+.input:focus { outline: none; border-bottom-color: #d3a625; box-shadow: 0 10px 20px -10px rgba(211, 166, 37, 0.5); }
 
-/* --- Mischief Managed & Success Screen --- */
-@keyframes write-out { from { width: 0; } to { width: 100%; } }
-@keyframes fade-out-all { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
-.mischief-container { text-align: center; animation: fade-out-all 1s ease-in forwards; animation-delay: 2.5s; background: none; padding: 0; box-shadow: none; }
-.mischief-text { font-size: 4rem; display: inline-block; color: #3a2e20; overflow: hidden; white-space: nowrap; animation: write-out 2.5s steps(40, end); border-right: .15em solid #5c4b37; }
-@keyframes unfurl { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-@keyframes glow { from { box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff; } to { box-shadow: 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #fff; } }
-.success-container { animation: fadeIn 1s ease-out; }
-.sorted-title { color: #3a2e20; font-size: 2.5rem; }
-.success-subtitle { font-size: 1.5rem !important; }
-.success-subtitle strong { color: #3a2e20; font-weight: bold; }
+.otp-container { display: flex; justify-content: center; gap: 1rem; }
+.otp-input { width: 55px; height: 70px; background: rgba(234, 224, 200, 0.05); border: 1px solid rgba(200, 159, 90, 0.3); border-radius: 8px; color: #EAE0C8; text-align: center; font-size: 2rem; font-family: 'Cinzel Decorative', cursive; transition: all 0.3s ease; }
+.otp-input:focus { outline: none; transform: scale(1.1); border-color: #d3a625; box-shadow: 0 0 15px rgba(211, 166, 37, 0.5); }
+
+.btn { padding: 14px 40px; border-radius: 50px; border: 2px solid rgba(211, 166, 37, 0.5); background-color: transparent; color: #EAE0C8; font-size: 1.1rem; font-weight: 700; cursor: pointer; letter-spacing: 1px; transition: all 0.3s ease; }
+.btn:hover { background-color: rgba(211, 166, 37, 0.1); border-color: #d3a625; text-shadow: 0 0 10px #d3a625; }
+.btn:disabled { cursor: not-allowed; opacity: 0.6; }
+
+
+/* --- [REFINED] Sorting Success Screen & Banners --- */
+@keyframes unfurl { 
+  0% { transform: scaleY(0.05); } 
+  50% { transform: scaleY(1.1); }
+  100% { transform: scaleY(1); } 
+}
+@keyframes glow { 
+  from { box-shadow: 0 0 8px #fff, 0 0 12px #fffaad, 0 0 18px #ffeb3b; } 
+  to { box-shadow: 0 0 15px #fff, 0 0 22px #fffaad, 0 0 30px #ffeb3b; } 
+}
+
+.success-container { 
+  animation: fadeIn 1s ease-out; 
+  width: 100%;
+}
+.sorted-title { font-size: 2.2rem; margin-bottom: 2rem; }
+
+.success-subtitle { 
+  font-size: 1.2rem !important; 
+  color: #EAE0C8 !important; 
+  margin-bottom: 0.5rem;
+}
+.house-name {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 3.5rem;
+  color: #d3a625;
+  text-shadow: 0 0 15px #d3a625;
+  margin-bottom: 2.5rem;
+  animation: fadeIn 2s ease-out;
+}
+
 .house-banners { display: flex; justify-content: center; gap: 2rem; height: 200px; margin-bottom: 2rem; }
-.banner { width: 60px; height: 100%; border: 3px solid #000; transform-origin: top; animation: unfurl 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; opacity: 0.3; filter: grayscale(80%); transition: all 0.5s ease; }
-.banner.chosen { opacity: 1; filter: grayscale(0%); transform: scale(1.1); animation: glow 1.5s ease-in-out infinite alternate; animation-delay: 1s; }
+
+.banner { 
+  width: 60px; 
+  height: 100%; 
+  border: 3px solid #000; 
+  transform-origin: top; 
+  animation: unfurl 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; 
+  opacity: 0.4; 
+  filter: grayscale(80%) brightness(0.7); 
+  transition: all 0.5s ease; 
+}
+.banner.chosen { 
+  opacity: 1; 
+  filter: grayscale(0%) brightness(1); 
+  transform: scale(1.05); 
+  animation: unfurl 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards, glow 1.5s ease-in-out infinite alternate; 
+  animation-delay: 0s, 1.2s;
+}
+
 .banner.gryffindor { background: linear-gradient(#7f0909 70%, #d3a625 70%); border-color: #d3a625; }
 .banner.slytherin { background: linear-gradient(#1a472a 70%, #aaaaaa 70%); border-color: #aaaaaa; }
 .banner.hufflepuff { background: linear-gradient(#ffc500 70%, #372e29 70%); border-color: #372e29; }
 .banner.ravenclaw { background: linear-gradient(#0e1a40 70%, #946b2d 70%); border-color: #946b2d; }
-.success-btn { animation: fadeIn 1s ease-out; animation-delay: 1s; }
+
+@keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 10px rgba(211, 166, 37, 0.2); } 50% { transform: scale(1.03); box-shadow: 0 0 20px rgba(211, 166, 37, 0.5); } 100% { transform: scale(1); box-shadow: 0 0 10px rgba(211, 166, 37, 0.2); } }
+.success-btn { 
+  animation: pulse 2.5s infinite ease-in-out; 
+  animation-delay: 1.5s; 
+  border-color: rgba(211, 166, 37, 0.8); 
+}
+
 
 /* --- Golden Snitch Animation --- */
-@keyframes fly-1 {
-  0% { transform: translateX(-10vw) translateY(30vh) rotate(-10deg); }
-  100% { transform: translateX(110vw) translateY(-20vh) rotate(15deg); }
-}
-@keyframes fly-2 {
-  0% { transform: translateX(-10vw) translateY(80vh) rotate(10deg); }
-  100% { transform: translateX(110vw) translateY(10vh) rotate(-15deg); }
-}
-@keyframes fly-3 {
-  0% { transform: translateX(110vw) translateY(50vh) rotate(-5deg); }
-  100% { transform: translateX(-10vw) translateY(60vh) rotate(10deg); }
-}
-@keyframes flap {
-  0%, 100% { transform: rotate3d(0, 1, 0, 0deg); }
-  50% { transform: rotate3d(0, 1, 0, 180deg); }
-}
-@keyframes glow-snitch {
-  from { filter: drop-shadow(0 0 5px #ffeb3b); }
-  to { filter: drop-shadow(0 0 15px #fffaad); }
-}
+@keyframes fly-1 { 0% { transform: translateX(-10vw) translateY(30vh) rotate(-10deg); } 100% { transform: translateX(110vw) translateY(-20vh) rotate(15deg); } }
+@keyframes fly-2 { 0% { transform: translateX(-10vw) translateY(80vh) rotate(10deg); } 100% { transform: translateX(110vw) translateY(10vh) rotate(-15deg); } }
+@keyframes fly-3 { 0% { transform: translateX(110vw) translateY(50vh) rotate(-5deg); } 100% { transform: translateX(-10vw) translateY(60vh) rotate(10deg); } }
+@keyframes flap { 0%, 100% { transform: rotate3d(0, 1, 0, 0deg); } 50% { transform: rotate3d(0, 1, 0, 180deg); } }
+@keyframes glow-snitch { from { filter: drop-shadow(0 0 5px #ffeb3b); } to { filter: drop-shadow(0 0 15px #fffaad); } }
+.snitch-container { position: absolute; top: 0; left: 0; z-index: 5; opacity: 0.95; cursor: pointer; }
+.snitch .body { fill: #ffdc3b; animation: glow-snitch 1s ease-in-out infinite alternate; }
+.snitch .wings { fill: #f0e6d2; stroke: #a37f40; stroke-width: 2px; }
+.snitch .wing { animation: flap 0.15s linear infinite; transform-origin: 100px 50px; }
+.snitch-1 { width: 90px; animation: fly-1 15s linear infinite; animation-delay: 0s; animation-fill-mode: backwards; }
+.snitch-2 { width: 60px; animation: fly-2 18s linear infinite; animation-delay: 5s; animation-fill-mode: backwards; }
+.snitch-3 { width: 100px; animation: fly-3 13s linear infinite; animation-delay: 9s; animation-fill-mode: backwards; }
 
-.snitch-container {
-  position: absolute;
+
+/* --- Modal Styles for Easter Egg --- */
+@keyframes fadeInModal {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+.modal-overlay {
+  position: fixed;
   top: 0;
   left: 0;
-  width: 90px;
-  /* --- VISIBILITY FIX: Make snitches fly IN FRONT of the UI --- */
-  z-index: 15;
-  opacity: 0.95;
-  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeInModal 0.3s ease-out;
 }
-.snitch .body {
-  fill: #ffdc3b;
-  animation: glow-snitch 1s ease-in-out infinite alternate;
+.modal-content {
+  background: #fdf6e3;
+  color: #3a2e20;
+  padding: 2rem;
+  border-radius: 10px;
+  border: 2px solid #c89f5a;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  text-align: center;
 }
-.snitch .wings {
-  /* --- VISIBILITY FIX: Made wings fully opaque --- */
-  fill: #f0e6d2; 
-  stroke: #a37f40;
-  stroke-width: 2px;
+.modal-title {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 2rem;
+  color: #5a1a1a;
+  margin-bottom: 1rem;
 }
-.snitch .wing {
-  animation: flap 0.15s linear infinite;
-  transform-origin: 100px 50px;
+.modal-text {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
 }
-
-/* Applying different flight paths and timings */
-/* --- VISIBILITY FIX: Slowed down animations --- */
-.snitch-1 { animation: fly-1 15s linear infinite; animation-delay: 0s; }
-.snitch-2 { animation: fly-2 18s linear infinite; animation-delay: 5s; width: 60px; }
-.snitch-3 { animation: fly-3 13s linear infinite; animation-delay: 9s; width: 100px; }
+.modal-content .btn {
+  background-color: #8A643A;
+  border: none;
+  color: #fff;
+  margin-top: 1rem;
+}
