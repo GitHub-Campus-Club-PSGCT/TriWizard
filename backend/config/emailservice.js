@@ -26,7 +26,7 @@ const EMAIL_CONFIG = {
  * @returns {Object} Configured transporter object
  */
 const createTransporter = () => {
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     host: EMAIL_CONFIG.host,
     port: EMAIL_CONFIG.port,
     secure: EMAIL_CONFIG.secure,
