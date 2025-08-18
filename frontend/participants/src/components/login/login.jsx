@@ -117,7 +117,7 @@ export default function Login() {
         
         {step === STEPS.SUCCESS && (
           <div className="mischief-container" key="success">
-            <h1 className="title success-title">Mischief Managed!</h1>
+            <h1 className="title success-title">Incantation Complete</h1>
           </div>
         )}
 
