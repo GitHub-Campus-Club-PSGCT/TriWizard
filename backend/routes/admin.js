@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const teamController = require("../controllers/teamController");
 
-router.get("/", (req, res) => {
-  res.json({ message: "Admin route works" });
-});
+router.post("/", teamController.createTeam);
 
 module.exports = router;
