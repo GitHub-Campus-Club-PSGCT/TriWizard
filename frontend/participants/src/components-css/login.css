@@ -1,212 +1,227 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Nunito+Sans:wght@400;700&display=swap');
 
-/* --- Global Reset for Full Screen Background --- */
-html, body {
+body, html {
   margin: 0;
   padding: 0;
-  height: 100%;
-  width: 100%;
   overflow: hidden;
+  font-family: 'Nunito Sans', sans-serif;
+  height: 100%;
 }
 
-/* --- Base & Magical Container --- */
 .magical-container {
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'Nunito Sans', sans-serif;
-  background-color: #05040a;
-  background-image: radial-gradient(circle at 50% 30%, #4a0e69 0%, #05040a 75%);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
-
-/* --- Animated Starry Background --- */
-.stars, .twinkling {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-}
-.stars {
-  background: transparent url(https://www.script-tutorials.com/demos/360/images/stars.png) repeat top center;
-  z-index: 1;
-}
-@keyframes move-twink-back { from {background-position:0 0;} to {background-position:-10000px 5000px;} }
-.twinkling {
-  background: transparent url(https://www.script-tutorials.com/demos/360/images/twinkling.png) repeat top center;
-  z-index: 2;
-  animation: move-twink-back 200s linear infinite;
-}
-
-/* --- Content Wrapper --- */
-@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-.content-wrapper {
-  z-index: 10;
-  width: 100%;
-  max-width: 500px;
-  padding: 0 1rem;
-  box-sizing: border-box;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.step-container { animation: fadeIn 1.2s ease-out; }
-
-/* --- Typography & Forms --- */
-.title { font-family: 'Cinzel Decorative', cursive; font-size: 3rem; font-weight: 700; color: #EAE0C8; text-shadow: 0 0 15px rgba(255, 223, 150, 0.7), 0 0 5px rgba(255, 223, 150, 0.5); margin-bottom: 0.5rem; }
-.subtitle { font-size: 1.1rem; color: #A98B5D; margin-bottom: 2.5rem; opacity: 0.9; }
-
-.magical-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem; 
-}
-
-.input { background: transparent; border: none; border-bottom: 2px solid rgba(200, 159, 90, 0.3); width: 100%; padding: 12px 10px; color: #FDF6E3; font-size: 1.2rem; text-align: center; transition: all 0.4s ease; box-sizing: border-box; }
-.input::placeholder { color: rgba(169, 139, 93, 0.5); }
-.input:focus { outline: none; border-bottom-color: #d3a625; box-shadow: 0 10px 20px -10px rgba(211, 166, 37, 0.5); }
-
-.otp-container { display: flex; justify-content: center; gap: 1rem; }
-.otp-input { width: 55px; height: 70px; background: rgba(234, 224, 200, 0.05); border: 1px solid rgba(200, 159, 90, 0.3); border-radius: 8px; color: #EAE0C8; text-align: center; font-size: 2rem; font-family: 'Cinzel Decorative', cursive; transition: all 0.3s ease; }
-.otp-input:focus { outline: none; transform: scale(1.1); border-color: #d3a625; box-shadow: 0 0 15px rgba(211, 166, 37, 0.5); }
-
-.btn { padding: 14px 40px; border-radius: 50px; border: 2px solid rgba(211, 166, 37, 0.5); background-color: transparent; color: #EAE0C8; font-size: 1.1rem; font-weight: 700; cursor: pointer; letter-spacing: 1px; transition: all 0.3s ease; }
-.btn:hover { background-color: rgba(211, 166, 37, 0.1); border-color: #d3a625; text-shadow: 0 0 10px #d3a625; }
-.btn:disabled { cursor: not-allowed; opacity: 0.6; }
-
-
-/* --- [REFINED] Sorting Success Screen & Banners --- */
-@keyframes unfurl { 
-  0% { transform: scaleY(0.05); } 
-  50% { transform: scaleY(1.1); }
-  100% { transform: scaleY(1); } 
-}
-@keyframes glow { 
-  from { box-shadow: 0 0 8px #fff, 0 0 12px #fffaad, 0 0 18px #ffeb3b; } 
-  to { box-shadow: 0 0 15px #fff, 0 0 22px #fffaad, 0 0 30px #ffeb3b; } 
-}
-
-.success-container { 
-  animation: fadeIn 1s ease-out; 
-  width: 100%;
-}
-.sorted-title { font-size: 2.2rem; margin-bottom: 2rem; }
-
-.success-subtitle { 
-  font-size: 1.2rem !important; 
-  color: #EAE0C8 !important; 
-  margin-bottom: 0.5rem;
-}
-.house-name {
-  font-family: 'Cinzel Decorative', cursive;
-  font-size: 3.5rem;
-  color: #d3a625;
-  text-shadow: 0 0 15px #d3a625;
-  margin-bottom: 2.5rem;
-  animation: fadeIn 2s ease-out;
-}
-
-.house-banners { display: flex; justify-content: center; gap: 2rem; height: 200px; margin-bottom: 2rem; }
-
-.banner { 
-  width: 60px; 
-  height: 100%; 
-  border: 3px solid #000; 
-  transform-origin: top; 
-  animation: unfurl 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; 
-  opacity: 0.4; 
-  filter: grayscale(80%) brightness(0.7); 
-  transition: all 0.5s ease; 
-}
-.banner.chosen { 
-  opacity: 1; 
-  filter: grayscale(0%) brightness(1); 
-  transform: scale(1.05); 
-  animation: unfurl 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards, glow 1.5s ease-in-out infinite alternate; 
-  animation-delay: 0s, 1.2s;
-}
-
-.banner.gryffindor { background: linear-gradient(#7f0909 70%, #d3a625 70%); border-color: #d3a625; }
-.banner.slytherin { background: linear-gradient(#1a472a 70%, #aaaaaa 70%); border-color: #aaaaaa; }
-.banner.hufflepuff { background: linear-gradient(#ffc500 70%, #372e29 70%); border-color: #372e29; }
-.banner.ravenclaw { background: linear-gradient(#0e1a40 70%, #946b2d 70%); border-color: #946b2d; }
-
-@keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 10px rgba(211, 166, 37, 0.2); } 50% { transform: scale(1.03); box-shadow: 0 0 20px rgba(211, 166, 37, 0.5); } 100% { transform: scale(1); box-shadow: 0 0 10px rgba(211, 166, 37, 0.2); } }
-.success-btn { 
-  animation: pulse 2.5s infinite ease-in-out; 
-  animation-delay: 1.5s; 
-  border-color: rgba(211, 166, 37, 0.8); 
-}
-
 
 /* --- Golden Snitch Animation --- */
 @keyframes fly-1 { 0% { transform: translateX(-10vw) translateY(30vh) rotate(-10deg); } 100% { transform: translateX(110vw) translateY(-20vh) rotate(15deg); } }
 @keyframes fly-2 { 0% { transform: translateX(-10vw) translateY(80vh) rotate(10deg); } 100% { transform: translateX(110vw) translateY(10vh) rotate(-15deg); } }
 @keyframes fly-3 { 0% { transform: translateX(110vw) translateY(50vh) rotate(-5deg); } 100% { transform: translateX(-10vw) translateY(60vh) rotate(10deg); } }
 @keyframes flap { 0%, 100% { transform: rotate3d(0, 1, 0, 0deg); } 50% { transform: rotate3d(0, 1, 0, 180deg); } }
-@keyframes glow-snitch { from { filter: drop-shadow(0 0 5px #ffeb3b); } to { filter: drop-shadow(0 0 15px #fffaad); } }
-.snitch-container { position: absolute; top: 0; left: 0; z-index: 5; opacity: 0.95; cursor: pointer; }
-.snitch .body { fill: #ffdc3b; animation: glow-snitch 1s ease-in-out infinite alternate; }
-.snitch .wings { fill: #f0e6d2; stroke: #a37f40; stroke-width: 2px; }
+
+/* --- ⬇️ Lighter Glow Style (Updated) ⬇️ --- */
+@keyframes glow-snitch {
+  from { filter: drop-shadow(0 0 5px #fff8e1) drop-shadow(0 0 9px #fff8e1); }
+  to { filter: drop-shadow(0 0 10px #fffbee) drop-shadow(0 0 18px #ffd700); }
+}
+
+.snitch-container { 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  z-index: 5; 
+  opacity: 0.95; 
+  cursor: pointer;
+}
+
+.snitch .body { 
+  fill: #ffdc3b; 
+  animation: glow-snitch 1.5s ease-in-out infinite alternate; 
+}
+.snitch .wings { fill: rgba(240, 230, 210, 0.8); stroke: #a37f40; stroke-width: 2px; }
 .snitch .wing { animation: flap 0.15s linear infinite; transform-origin: 100px 50px; }
-.snitch-1 { width: 90px; animation: fly-1 15s linear infinite; animation-delay: 0s; animation-fill-mode: backwards; }
-.snitch-2 { width: 60px; animation: fly-2 18s linear infinite; animation-delay: 5s; animation-fill-mode: backwards; }
-.snitch-3 { width: 100px; animation: fly-3 13s linear infinite; animation-delay: 9s; animation-fill-mode: backwards; }
 
+.snitch-1 { 
+  width: 70px;
+  animation: fly-1 10s linear infinite;
+  animation-fill-mode: backwards;
+  animation-delay: 0s;
+}
+.snitch-2 { 
+  width: 45px;
+  animation: fly-2 12s linear infinite;
+  animation-fill-mode: backwards;
+  animation-delay: 5s;
+}
+.snitch-3 { 
+  width: 80px;
+  animation: fly-3 9s linear infinite;
+  animation-fill-mode: backwards;
+  animation-delay: 9s;
+}
 
-/* --- Modal Styles for Easter Egg --- */
+/* --- UI and Theme Styles --- */
+
+.floating-ui {
+  z-index: 10;
+  position: relative;
+  background: rgba(25, 25, 25, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255, 255, 255, 0.09);
+  border-radius: 21px;
+  box-shadow: 0 10px 36px rgba(0,0,0,0.40);
+  padding: 3rem 2.5rem 2.5rem 2.5rem;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  margin: 1rem;
+}
+
+.title {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #FFF6E1;
+  letter-spacing: 1px;
+  text-shadow: 0 0 20px rgba(255,223,150,0.85), 0 0 12px #fff;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  color: #A98B5D;
+  margin-bottom: 3rem;
+  opacity: 0.94;
+}
+
+.input { background: transparent; border: none; border-bottom: 2px solid rgba(211, 166, 37, 0.4); width: 90%; padding: 14px 10px; color: #FDF6E3; font-size: 1.2rem; text-align: center; transition: all 0.4s ease; margin-bottom: .9em; }
+.input::placeholder { color: rgba(169, 139, 93, 0.55); }
+.input:focus { outline: none; border-bottom-color: #D3A625; box-shadow: 0 10px 20px -10px rgba(211, 166, 37, 0.5); }
+.otp-container { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; }
+.otp-input { width: 55px; height: 70px; background: rgba(234, 224, 200, 0.08); border: 1px solid rgba(211, 166, 37, 0.4); border-radius: 8px; color: #EAE0C8; text-align: center; font-size: 2rem; font-family: 'Cinzel Decorative', cursive; transition: all 0.3s ease; }
+.otp-input:focus { outline: none; transform: scale(1.1); border-color: #D3A625; box-shadow: 0 0 16px rgba(211, 166, 37, 0.5); }
+.btn { padding: 14px 40px; border-radius: 50px; border: 2px solid rgba(211, 166, 37, 0.4); background-color: transparent; color: #EAE0C8; font-size: 1.1rem; font-weight: 700; cursor: pointer; letter-spacing: 1px; transition: all 0.3s ease; }
+.btn:hover { background-color: rgba(211, 166, 37, 0.15); border-color: #D3A625; text-shadow: 0 0 12px rgba(211, 166, 37, 0.7); }
+
+/* --- Mischief Managed Style --- */
+@keyframes magical-reveal-and-fade {
+  0% { opacity: 0; filter: blur(10px) drop-shadow(0 0 15px gold); }
+  30% { opacity: 1; filter: blur(0) drop-shadow(0 0 5px gold); }
+  80% { opacity: 1; filter: blur(0) drop-shadow(0 0 5px gold); }
+  100% { opacity: 0; filter: blur(10px) drop-shadow(0 0 15px gold); }
+}
+
+.mischief-container {
+  padding: 0;
+  animation: magical-reveal-and-fade 3.5s ease-out forwards;
+}
+
+.mischief-container .success-title {
+  font-size: 4rem;
+}
+
+/* --- Sorting Ceremony Style --- */
+@keyframes container-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes unfurl {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+@keyframes chosen-glow {
+  0% { box-shadow: 0 0 15px 3px #fff, 0 0 25px 8px #ffd700; }
+  100% { box-shadow: 0 0 20px 5px #fff, 0 0 35px 12px #ffd700; }
+}
+
+.sorting-container {
+  padding: 0;
+  animation: container-fade-in 1s 0.2s ease-out backwards;
+}
+
+.sorted-title { font-size: 2.5rem; margin-bottom: 2rem; }
+.success-subtitle { font-size: 1.5rem !important; color: #EAE0C8 !important; }
+.success-subtitle strong { color: #D3A625; text-shadow: 0 0 15px #D3A625; }
+.house-banners { display: flex; justify-content: center; align-items: flex-start; gap: 2rem; height: 180px; margin-bottom: 2rem; }
+
+.banner { 
+  width: 60px; 
+  height: 100%; 
+  border: 3px solid #000;
+  opacity: 0.5; 
+  filter: grayscale(50%) brightness(0.8);
+  transform-origin: top;
+  animation: unfurl 0.8s 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) backwards;
+  transition: all 0.4s ease;
+}
+.banner.chosen { 
+  opacity: 1; 
+  filter: none; 
+  transform: scale(1.11); 
+  animation: unfurl 0.8s 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) backwards, chosen-glow 1.5s 1.3s infinite alternate;
+}
+
+.banner.gryffindor { background: linear-gradient(#7f0909 70%, #d3a625 70%); border-color: #d3a625; }
+.banner.slytherin { background: linear-gradient(#1a472a 70%, #aaaaaa 70%); border-color: #aaaaaa; }
+.banner.hufflepuff { background: linear-gradient(#ffc500 70%, #372e29 70%); border-color: #372e29; }
+.banner.ravenclaw { background: linear-gradient(#0e1a40 70%, #946b2d 70%); border-color: #946b2d; }
+.success-btn { border-color: rgba(211, 166, 37, 0.7); animation: chosen-glow 2s infinite alternate; animation-delay: 2s;}
+
+/* --- Snitch Details Modal Styles --- */
 @keyframes fadeInModal {
-  from { opacity: 0; transform: scale(0.9); }
+  from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
+
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex; justify-content: center; align-items: center;
   z-index: 1000;
   animation: fadeInModal 0.3s ease-out;
 }
+
 .modal-content {
-  background: #fdf6e3;
-  color: #3a2e20;
-  padding: 2rem;
-  border-radius: 10px;
-  border: 2px solid #c89f5a;
+  background: rgba(25, 25, 25, 0.25);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 21px;
+  box-shadow: 0 10px 36px rgba(0,0,0,0.5);
+  padding: 2.5rem 3rem;
+  max-width: 450px;
   width: 90%;
-  max-width: 500px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   text-align: center;
+  color: #FFF6E1;
 }
+
 .modal-title {
   font-family: 'Cinzel Decorative', cursive;
-  font-size: 2rem;
-  color: #5a1a1a;
-  margin-bottom: 1rem;
-}
-.modal-text {
-  font-family: 'Nunito Sans', sans-serif;
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 2.5rem;
+  margin-top: 0;
   margin-bottom: 1.5rem;
+  color: #EAE0C8;
+  text-shadow: 0 0 15px rgba(255, 223, 150, 0.7);
 }
-.modal-content .btn {
-  background-color: #8A643A;
-  border: none;
-  color: #fff;
+
+.modal-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+  color: #d1c6b2;
+}
+
+.modal-close-btn {
   margin-top: 1rem;
 }
