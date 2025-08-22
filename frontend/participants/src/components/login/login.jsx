@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../../components-css/login.css"; // Your original CSS path
+import axios from "axios"; // ✅ ES6 import
 import mapBackground from "../../assets/Images/LoginBG.png"; // Your background image path
 
 const STEPS = {
@@ -130,65 +131,68 @@ export default function Login() {
   const handleSnitchClick = () => setIsModalVisible(true);
   const handleCloseModal = () => setIsModalVisible(false);
 
-  const handleGetOtp = (e) => {
-    e.preventDefault();
-    setOtpError(""); // Clear previous errors
-    setLoading(true);
-    setTimeout(() => {
-      const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      setGeneratedOtp(newOtp);
-      console.log("🤫 Secret Code (for testing):", newOtp);
-      setStep(STEPS.OTP);
-      setLoading(false);
-    }, 1200);
-  };
+  const handleGetOtp = async(e) => { e.preventDefault(); 
+    setLoading(true); 
+     try {
+    const response = await axios.post("http://localhost:5000/login/otp-gen", {
+      teamName: email  // or teamName if your schema expects that
+    });
 
-  const handleVerifyOtp = (e) => {
-    e.preventDefault();
-    const enteredOtp = otp.join("");
-    if (enteredOtp.length < OTP_LENGTH) return;
-    if (enteredOtp === generatedOtp) {
-      setAssignedHouse(HOUSES[Math.floor(Math.random() * HOUSES.length)]);
-      setStep(STEPS.SUCCESS);
-      setOtpError("");
+    console.log("✅ OTP Response:", response.data);
+
+    // Save the OTP if backend sends it (or you only rely on verify API)
+    if (response.data.otp) {
+      setGeneratedOtp(response.data.otp);
+    }
+
+    setStep(STEPS.OTP);
+  } catch (error) {
+    console.error("❌ Error generating OTP:", error.response?.data || error.message);
+    alert("Could not generate OTP, try again.");
+  } finally {
+    setLoading(false);
+  }
+}; 
+
+  
+  const handleVerifyOtp = async (e) => {
+  e.preventDefault();
+  const enteredOtp = otp.join("");
+  if (enteredOtp.length < 6) return;
+
+  try {
+    const response = await axios.post("http://localhost:5000/login/otp-verify", {
+      teamName: email,
+      otp: enteredOtp
+    });
+
+    console.log("✅ Verify Response:", response.data);
+
+    if (response.data.success) {
+      const houses = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"];
+      setAssignedHouse(houses[Math.floor(Math.random() * houses.length)]);
+      setStep(STEPS.CLEARED);
     } else {
-      setOtpError("Wrong spell! Please try again.");
+      alert("Wrong spell! Please try again.");
     }
-  };
+  } catch (error) {
+    console.error("❌ Error verifying OTP:", error.response?.data || error.message);
+    alert("OTP verification failed.");
+  }
+};
 
-  const handleOtpChange = (element, index) => {
-    if (isNaN(element.value)) return false;
-    setOtp([...otp.map((d, idx) => (idx === index ? element.value : d))]);
-    if (element.nextSibling && element.value) element.nextSibling.focus();
+  
+  const handleOtpChange = (element, index) => { if (isNaN(element.value)) return false; 
+    setOtp([...otp.map((d, idx) => (idx === index ? element.value : d))]); 
+    if (element.nextSibling && element.value) { element.nextSibling.focus(); 
+    } 
   };
+  const handleOtpKeyDown = (e, index) => { if (e.key === "Backspace" && !otp[index] && index > 0 && otpInputRefs.current[index - 1]) { otpInputRefs.current[index - 1].focus();
 
-  const handleOtpKeyDown = (e, index) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0 && otpInputRefs.current[index - 1]) {
-      otpInputRefs.current[index - 1].focus();
-    }
-  };
+   } 
+};
 
-  const renderStep = () => {
-    switch (step) {
-      case STEPS.EMAIL:
-        return <EmailStep onSubmit={handleGetOtp} email={email} setEmail={setEmail} loading={loading} />;
-      case STEPS.OTP:
-        return <OtpStep
-          onSubmit={handleVerifyOtp}
-          otp={otp}
-          onOtpChange={handleOtpChange}
-          onOtpKeyDown={handleOtpKeyDown}
-          otpInputRefs={otpInputRefs}
-          error={otpError}
-        />;
-      case STEPS.SUCCESS:
-        return <SuccessStep />;
-      case STEPS.CLEARED:
-        return <ClearedStep assignedHouse={assignedHouse} />;
-      default:
-        return null;
-    }
-  };
+  const Snitch = () => ( <svg className="snitch" viewBox="0 0 200 100"> <g className="wings"> <path className="wing" d="M50,50 Q20,20 0,50 Q20,80 50,50 Z" /> <path className="wing" d="M150,50 Q180,20 200,50 Q180,80 150,50 Z" /> </g> <circle className="body" cx="100" cy="50" r="15" /> </svg> );
 
   return (
     <div
@@ -212,4 +216,4 @@ export default function Login() {
       {isModalVisible && <SnitchDetailsModal onClose={handleCloseModal} />}
     </div>
   );
-}
+};
