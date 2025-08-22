@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../../components-css/login.css"; // Your original CSS path
+import axios from "axios"; // ✅ ES6 import
 import mapBackground from "../../assets/Images/LoginBG.png"; // Your background image path
 
 const STEPS = {

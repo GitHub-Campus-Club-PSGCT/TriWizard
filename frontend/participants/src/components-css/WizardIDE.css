@@ -1,0 +1,116 @@
+/* Base layout */
+.wizard-ide {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: monospace;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+}
+
+.themes button {
+  margin: 0 4px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.themes button.active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.editor {
+  flex: 1;
+  margin: 12px;
+  padding: 12px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+}
+
+.run-btn {
+  margin: 0 12px;
+  padding: 10px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.output {
+  margin: 12px;
+  padding: 12px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  min-height: 100px;
+}
+
+/* ------------------ THEMES ------------------ */
+
+/* Gryffindor */
+.gryffindor {
+  --bg: #1a0b0b;
+  --panel: #2a0e0e;
+  --border: #441414;
+  --text: #f9e7cf;
+  --accent: #b31b1b;
+  --accent-contrast: #ffd166;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Hufflepuff */
+.hufflepuff {
+  --bg: #0c0c0a;
+  --panel: #141412;
+  --border: #2d2d27;
+  --text: #fff7cc;
+  --accent: #e5c100;
+  --accent-contrast: #222222;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Ravenclaw */
+.ravenclaw {
+  --bg: #0a0e14;
+  --panel: #0f141b;
+  --border: #1d2a38;
+  --text: #d7e3f4;
+  --accent: #204b8f;
+  --accent-contrast: #c4923e;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Slytherin */
+.slytherin {
+  --bg: #070a09;
+  --panel: #0f1412;
+  --border: #203127;
+  --text: #e3f2ea;
+  --accent: #2f8f6b;
+  --accent-contrast: #dfe6e1;
+  background: var(--bg);
+  color: var(--text);
+}
