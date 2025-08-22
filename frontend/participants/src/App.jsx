@@ -1,14 +1,14 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Login from './components/login/login'
-import Map from './components/dashboard/map'
 import './App.css'
+import WizardIDE from './components/login/console'
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/map" element={<Map />} />
+        <Route path="/ide" element={<WizardIDE />} />
       </Routes>
     </Router>
   )
