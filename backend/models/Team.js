@@ -12,7 +12,7 @@ const teamSchema = new mongoose.Schema({
   otp: { type: Number, default: null },
   testCasesPassed: { type: [Number], default: [] },
   score: { type: Number, default: null },
-  houseName: { type: String, required: true }
+  houseName: { type: String, default:"unknown" }
 });
 
 module.exports = mongoose.model("Team", teamSchema);
