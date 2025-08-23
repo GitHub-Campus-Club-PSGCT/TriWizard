@@ -22,6 +22,9 @@ app.use("/api/email", emailRoutes);
 const teamRoutes = require("./routes/admin");
 app.use("/admin", teamRoutes);
 
+const questionRoutes = require("./routes/questions");
+app.use("/questions", questionRoutes);
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
 
