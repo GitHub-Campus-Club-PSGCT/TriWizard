@@ -63,8 +63,8 @@ export default function Login() {
   const handleGetOtp = async(e) => { e.preventDefault(); 
     setLoading(true); 
      try {
-    const response = await axios.post("http://localhost:5000/login/otp-gen", {
-      teamName: email  // or teamName if your schema expects that
+    const response = await axios.post("http://localhost:8080/login/otp-gen", {
+      email: email  // or teamName if your schema expects that
     });
 
     console.log("✅ OTP Response:", response.data);
@@ -90,7 +90,7 @@ export default function Login() {
   if (enteredOtp.length < 6) return;
 
   try {
-    const response = await axios.post("http://localhost:5000/login/otp-verify", {
+    const response = await axios.post("http://localhost:8080/login/otp-verify", {
       teamName: email,
       otp: enteredOtp
     });

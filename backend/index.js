@@ -1,7 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
-
+const cors = require("cors");
 dotenv.config();
 const app = express();
 
@@ -10,6 +10,12 @@ connectDB();
 
 // Middleware
 app.use(express.json());
+app.use(cors({
+  origin: "http://localhost:5173", // your frontend
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
 
 // Import combined routes
 const routes = require("./routes");
