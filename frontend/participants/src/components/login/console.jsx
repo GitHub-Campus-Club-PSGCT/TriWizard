@@ -3,29 +3,43 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 export default function WizardIDE() {
-  const { ques_id } = useParams(); // 👈 get ques_id from route
-  const [theme, setTheme] = useState("gryffindor"); 
+  const { housename, questionNumber } = useParams(); // 👈 from /:housename/:questionNumber
+  const [theme, setTheme] = useState(housename); // auto theme = housename
   const [code, setCode] = useState("// Loading question...");
   const [output, setOutput] = useState("Result will appear here...");
+  const [testCases, setTestCases] = useState([]);
 
-  // 🔹 Fetch buggy code for this question when page loads
+  const themeMap = {
+    "1": "gryffindor",
+    "2": "Hufflepuff",
+    "3": "Ravenclaw",
+    "4": "Slytherin",
+  };
+
+  // 🔹 Fetch buggy code & testcases
   useEffect(() => {
+    if (themeMap[1]) {
+      setTheme(themeMap[1]);
+    }
     const fetchBuggyCode = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/buggy-codes/${ques_id}`);
+        const res = await fetch("http://localhost:8080/questions/Gryffindor/1");
         const data = await res.json();
-        if (data && data.code) {
-          setCode(data.code);
+
+        if (data && data.success && data.question) {
+          setCode(data.question.buggedCode);
+          setTestCases(data.question.testCases || []);
         } else {
           setCode("// No buggy code found for this question.");
         }
+
       } catch (err) {
         setCode("// ⚠ Error fetching buggy code.");
       }
     };
 
     fetchBuggyCode();
-  }, [ques_id]);
+  }, [housename, questionNumber]);
 
   // 🔹 Run code by sending to backend
   const runCode = async () => {
@@ -33,7 +47,7 @@ export default function WizardIDE() {
       const res = await fetch("http://localhost:5000/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, ques_id }), // 👈 also send ques_id
+        body: JSON.stringify({ code, housename, questionNumber }),
       });
       const data = await res.json();
       setOutput(data.output || "No output");
@@ -44,20 +58,12 @@ export default function WizardIDE() {
 
   return (
     <div className={`wizard-ide ${theme}`}>
-      {/* Top Bar with Theme Selector */}
+      {/* Top Bar with Theme */}
       <div className="topbar">
-        <h2>Wizard IDE 🪄 – Question {ques_id}</h2>
-        <div className="themes">
-          {["gryffindor", "hufflepuff", "ravenclaw", "slytherin"].map((h) => (
-            <button
-              key={h}
-              onClick={() => setTheme(h)}
-              className={theme === h ? "active" : ""}
-            >
-              {h}
-            </button>
-          ))}
-        </div>
+        <h2>
+          Wizard IDE 🪄 – {housename} | Question {questionNumber}
+        </h2>
+        <p className="theme-label">Theme: {theme}</p>
       </div>
 
       {/* Code Editor */}
@@ -72,8 +78,22 @@ export default function WizardIDE() {
         ▶ Run
       </button>
 
+      {/* ✅ Testcases Display */}
+      {testCases.length > 0 && (
+        <div className="testcase-box">
+          <h3>Test Cases</h3>
+          {testCases.map((tc, i) => (
+            <div key={i} className="testcase">
+              <p><b>Input:</b> {tc.input}</p>
+              <p><b>Expected Output:</b> {tc.expected}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Output Section */}
       <div className="output">
+        <h3>Your Output</h3>
         <pre>{output}</pre>
       </div>
     </div>

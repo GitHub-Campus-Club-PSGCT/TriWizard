@@ -55,6 +55,22 @@
   font-weight: bold;
 }
 
+.testcase-box {
+  background: #222;
+  color: #eee;
+  padding: 14px;
+  border-radius: 12px;
+  margin-top: 16px;
+}
+
+.testcase {
+  background: #333;
+  padding: 8px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+
 .output {
   margin: 12px;
   padding: 12px;
