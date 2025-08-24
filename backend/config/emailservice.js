@@ -11,14 +11,16 @@ const EMAIL_CONFIG = {
   host: 'smtp.gmail.com', // Change to your SMTP host
   port: 587, // 587 for TLS, 465 for SSL
   secure: false, // true for 465, false for other ports
+  //requireTLS: true, // Force TLS
   
   // Authentication - Replace with your credentials
-  user: 'your-email@gmail.com', // Your sender email
-  pass: 'your-app-password', // Your app password (NOT regular password)
-  
+  user: 'lksubhasree@gmail.com', // Your sender email
+  pass: 'xjzshyvavbxjxpsq', // Your app password (NOT regular password)
+
+
   // Sender Details
-  senderName: 'Your App Name', // Replace with your app/company name
-  senderEmail: 'your-email@gmail.com' // Should match the user above
+  senderName: 'Sree', // Replace with your app/company name
+  senderEmail: 'lksubhasree@gmail.com' // Should match the user above
 };
 
 /**
