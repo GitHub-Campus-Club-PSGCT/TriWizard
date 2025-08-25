@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import "../../components-css/login.css"; // Your original CSS path
-import axios from "axios"; // ✅ ES6 import
-import mapBackground from "../../assets/Images/LoginBG.png"; // Your background image path
+import "../../components-css/login.css";
+import axios from "axios";
+import mapBackground from "../../assets/Images/LoginBG.png";
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
+const OTP_LENGTH = 6;
+const HOUSES = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"];
 const STEPS = {
   EMAIL: "email",
   OTP: "otp",
@@ -20,8 +24,7 @@ const Snitch = React.memo(() => (
   </svg>
 ));
 
-const SnitchDetailsModal = ({ onClose }) => {
-  return (
+const SnitchDetailsModal = ({ onClose }) => (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">The Golden Snitch</h2>
@@ -35,18 +38,88 @@ const SnitchDetailsModal = ({ onClose }) => {
         </button>
       </div>
     </div>
-  );
-};
+);
+
+const EmailStep = ({ onSubmit, email, setEmail, loading }) => (
+    <div className="step-container" key="email">
+      <h1 className="title">REVEAL YOUR<br />IDENTITY</h1>
+      <p className="subtitle">Only the worthy may enter the castle grounds.</p>
+      <form onSubmit={onSubmit} className="magical-form">
+        <input
+          id="email-input"
+          type="email"
+          placeholder="Your magical signature (email)"
+          className="input"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <button type="submit" className="btn" disabled={loading}>
+          {loading ? "Casting..." : "Cast Spell"}
+        </button>
+      </form>
+    </div>
+);
+
+const OtpStep = ({ onSubmit, otp, onOtpChange, onOtpKeyDown, otpInputRefs, error }) => (
+    <div className="step-container" key="otp">
+      <h1 className="title">The Final Incantation</h1>
+      <p className="subtitle">Whisper the six secret runes to unlock the way.</p>
+      <form onSubmit={onSubmit} className="magical-form">
+        <div className="otp-container">
+          {otp.map((data, index) => (
+            <input
+              key={index}
+              type="text"
+              aria-label={`OTP digit ${index + 1}`}
+              className="otp-input"
+              value={data}
+              maxLength="1"
+              onChange={e => onOtpChange(e.target, index)}
+              onKeyDown={e => onOtpKeyDown(e, index)}
+              ref={el => (otpInputRefs.current[index] = el)}
+              required
+            />
+          ))}
+        </div>
+        {error && <p className="error-text">{error}</p>}
+        <button type="submit" className="btn">Unlock</button>
+      </form>
+    </div>
+);
+
+const SuccessStep = () => (
+    <div className="mischief-container" key="success">
+      <h1 className="title success-title">Incantation Complete</h1>
+    </div>
+);
+
+const ClearedStep = ({ assignedHouse, onNavigate }) => (
+    <div className="sorting-container" key="cleared">
+      <h1 className="title sorted-title">The Sorting Ceremony is Complete!</h1>
+      <div className="house-banners">
+        {HOUSES.map(house => (
+          <div key={house} className={`banner ${house.toLowerCase()} ${assignedHouse === house ? 'chosen' : ''}`}></div>
+        ))}
+      </div>
+      <p className="subtitle success-subtitle">You belong to... <strong>{assignedHouse}!</strong></p>
+      <button className="btn success-btn" onClick={onNavigate}>
+        Enter the Great Hall
+      </button>
+    </div>
+);
 
 export default function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate(); 
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState(new Array(6).fill(""));
-  const [generatedOtp, setGeneratedOtp] = useState("");
+  const [otp, setOtp] = useState(new Array(OTP_LENGTH).fill(""));
   const [step, setStep] = useState(STEPS.EMAIL);
   const [loading, setLoading] = useState(false);
   const [assignedHouse, setAssignedHouse] = useState(null);
-  const otpInputRefs = useRef([]);
+  const [otpError, setOtpError] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const otpInputRefs = useRef([]);
 
   useEffect(() => {
     if (step === STEPS.SUCCESS) {
@@ -55,117 +128,101 @@ export default function Login() {
       }, 3500);
       return () => clearTimeout(timer);
     }
-  }, [step]);
+    if (step === STEPS.CLEARED && assignedHouse) {
+      const navTimer = setTimeout(() => {
+        navigate(`/${assignedHouse.toLowerCase()}/map`);
+      }, 2000);
+      return () => clearTimeout(navTimer);
+    }
+  }, [step, assignedHouse, navigate]);
 
   const handleSnitchClick = () => setIsModalVisible(true);
   const handleCloseModal = () => setIsModalVisible(false);
 
-  const handleGetOtp = async(e) => { e.preventDefault(); 
-    setLoading(true); 
-     try {
-    const response = await axios.post("http://localhost:8080/login/otp-gen", {
-      email: email  // or teamName if your schema expects that
-    });
-
-    console.log("✅ OTP Response:", response.data);
-
-    // Save the OTP if backend sends it (or you only rely on verify API)
-    if (response.data.otp) {
-      setGeneratedOtp(response.data.otp);
+  const handleGetOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await axios.post("http://localhost:8080/login/otp-gen", {
+        email: email,
+      });
+      setStep(STEPS.OTP);
+    } catch (error) {
+      console.error("❌ Error generating OTP:", error.response?.data || error.message);
+      alert("Could not generate OTP, try again.");
+    } finally {
+      setLoading(false);
     }
-
-    setStep(STEPS.OTP);
-  } catch (error) {
-    console.error("❌ Error generating OTP:", error.response?.data || error.message);
-    alert("Could not generate OTP, try again.");
-  } finally {
-    setLoading(false);
-  }
-}; 
-
-  
-  const handleVerifyOtp = async (e) => {
-  e.preventDefault();
-  const enteredOtp = otp.join("");
-  if (enteredOtp.length < 6) return;
-
-  try {
-    const response = await axios.post("http://localhost:8080/login/otp-verify", {
-      teamName: email,
-      otp: enteredOtp
-    });
-
-    console.log("✅ Verify Response:", response.data);
-
-    if (response.data.success) {
-      const houses = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"];
-      setAssignedHouse(houses[Math.floor(Math.random() * houses.length)]);
-      setStep(STEPS.CLEARED);
-    } else {
-      alert("Wrong spell! Please try again.");
-    }
-  } catch (error) {
-    console.error("❌ Error verifying OTP:", error.response?.data || error.message);
-    alert("OTP verification failed.");
-  }
-};
-
-  
-  const handleOtpChange = (element, index) => { if (isNaN(element.value)) return false; 
-    setOtp([...otp.map((d, idx) => (idx === index ? element.value : d))]); 
-    if (element.nextSibling && element.value) { element.nextSibling.focus(); 
-    } 
   };
-  const handleOtpKeyDown = (e, index) => { if (e.key === "Backspace" && !otp[index] && index > 0 && otpInputRefs.current[index - 1]) { otpInputRefs.current[index - 1].focus();
 
-   } 
-};
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    const enteredOtp = otp.join("");
+    if (enteredOtp.length < OTP_LENGTH) return;
+    setOtpError("");
 
-  const Snitch = () => ( <svg className="snitch" viewBox="0 0 200 100"> <g className="wings"> <path className="wing" d="M50,50 Q20,20 0,50 Q20,80 50,50 Z" /> <path className="wing" d="M150,50 Q180,20 200,50 Q180,80 150,50 Z" /> </g> <circle className="body" cx="100" cy="50" r="15" /> </svg> );
+    const decodedUser = await login(email, enteredOtp);
+
+    if (decodedUser && decodedUser.house) {
+      setAssignedHouse(decodedUser.house);
+      setStep(STEPS.SUCCESS);
+    } else {
+      setOtpError("Wrong spell! The runes are incorrect.");
+    }
+  };
+
+  const handleOtpChange = (element, index) => {
+    if (isNaN(element.value)) return false;
+    setOtp([...otp.map((d, idx) => (idx === index ? element.value : d))]);
+    if (element.nextSibling && element.value) {
+      element.nextSibling.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (e, index) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0 && otpInputRefs.current[index - 1]) {
+      otpInputRefs.current[index - 1].focus();
+    }
+  };
+
+  const renderStep = () => {
+    switch (step) {
+      case STEPS.OTP:
+        return <OtpStep
+          onSubmit={handleVerifyOtp}
+          otp={otp}
+          onOtpChange={handleOtpChange}
+          onOtpKeyDown={handleOtpKeyDown}
+          otpInputRefs={otpInputRefs}
+          error={otpError}
+        />;
+      case STEPS.SUCCESS:
+        return <SuccessStep />;
+      case STEPS.CLEARED:
+        return <ClearedStep
+          assignedHouse={assignedHouse}
+          onNavigate={() => navigate(`/${assignedHouse.toLowerCase()}/map`)}
+        />;
+      case STEPS.EMAIL:
+      default:
+        return <EmailStep
+          onSubmit={handleGetOtp}
+          email={email}
+          setEmail={setEmail}
+          loading={loading}
+        />;
+    }
+  };
 
   return (
-    <div
-      className="page magical-container"
-      style={{ backgroundImage: `url(${mapBackground})` }}
-    >
-      <div className="snitch-container snitch-1" onClick={handleSnitchClick}>
-        <Snitch />
-      </div>
-      <div className="snitch-container snitch-2" onClick={handleSnitchClick}>
-        <Snitch />
-      </div>
-      <div className="snitch-container snitch-3" onClick={handleSnitchClick}>
-        <Snitch />
-      </div>
-
+    <div className="page magical-container" style={{ backgroundImage: `url(${mapBackground})` }}>
+      <div className="snitch-container snitch-1" onClick={handleSnitchClick}><Snitch /></div>
+      <div className="snitch-container snitch-2" onClick={handleSnitchClick}><Snitch /></div>
+      <div className="snitch-container snitch-3" onClick={handleSnitchClick}><Snitch /></div>
       <div className="floating-ui">
-        {step === STEPS.EMAIL && ( <div className="step-container" key="email"> <h1 className="title">REVEAL YOUR<br />IDENTITY</h1> <p className="subtitle">Only the worthy may enter the castle grounds.</p> <form onSubmit={handleGetOtp} className="magical-form"> <input type="email" placeholder="Your magical signature (email)" className="input" value={email} onChange={(e) => setEmail(e.target.value)} required /> <button type="submit" className="btn" disabled={loading}> {loading ? "Casting..." : "Cast Spell"} </button> </form> </div> )}
-        {step === STEPS.OTP && ( <div className="step-container" key="otp"> <h1 className="title">The Final Incantation</h1> <p className="subtitle">Whisper the six secret runes to unlock the way.</p> <form onSubmit={handleVerifyOtp} className="magical-form"> <div className="otp-container"> {otp.map((data, index) => ( <input key={index} type="text" className="otp-input" value={data} maxLength="1" onChange={e => handleOtpChange(e.target, index)} onKeyDown={e => handleOtpKeyDown(e, index)} ref={el => (otpInputRefs.current[index] = el)} required /> ))} </div> <button type="submit" className="btn">Unlock</button> </form> </div> )}
-        
-        {step === STEPS.SUCCESS && (
-          <div className="mischief-container" key="success">
-            <h1 className="title success-title">Incantation Complete</h1>
-          </div>
-        )}
-
-        {step === STEPS.CLEARED && (
-          <div className="sorting-container" key="cleared">
-            <h1 className="title sorted-title">The Sorting Ceremony is Complete!</h1>
-            <div className="house-banners">
-              <div className={`banner gryffindor ${assignedHouse === 'Gryffindor' ? 'chosen' : ''}`}></div>
-              <div className={`banner hufflepuff ${assignedHouse === 'Hufflepuff' ? 'chosen' : ''}`}></div>
-              <div className={`banner ravenclaw ${assignedHouse === 'Ravenclaw' ? 'chosen' : ''}`}></div>
-              <div className={`banner slytherin ${assignedHouse === 'Slytherin' ? 'chosen' : ''}`}></div>
-            </div>
-            <p className="subtitle success-subtitle">You belong to... <strong>{assignedHouse}!</strong></p>
-            <button className="btn success-btn" onClick={() => alert('Navigating to the Great Hall dashboard!')}>
-              Enter the Great Hall
-            </button>
-          </div>
-        )}
+        {renderStep()}
       </div>
-
       {isModalVisible && <SnitchDetailsModal onClose={handleCloseModal} />}
     </div>
   );
-};
+}
