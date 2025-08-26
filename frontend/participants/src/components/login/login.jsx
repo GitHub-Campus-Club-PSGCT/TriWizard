@@ -233,4 +233,4 @@ export default function Login() {
       {isModalVisible && <SnitchDetailsModal onClose={handleCloseModal} />}
     </div>
   );
-}
+};
