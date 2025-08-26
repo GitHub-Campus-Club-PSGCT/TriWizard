@@ -8,8 +8,8 @@ const testConfig1 = async () => {
     port: 587,
     secure: false, // TLS
     auth: {
-      user: 'lksubhasree@gmail.com',
-      pass: 'xjzshyvavbxjxpsq'
+      user: '',
+      pass: ''
     },
     connectionTimeout: 60000,
     logger: true
@@ -33,8 +33,8 @@ const testConfig2 = async () => {
     port: 465,
     secure: true, // SSL
     auth: {
-      user: 'lksubhasree@gmail.com',
-      pass: 'xjzshyvavbxjxpsq'
+      user: '',
+      pass: ''
     },
     connectionTimeout: 60000,
     logger: true
@@ -77,9 +77,9 @@ const testSendEmail = async () => {
   
   try {
     const result = await sendOTPEmail({
-      recipientEmail: 'lksubhasree@gmail.com', // Send to yourself first
-      recipientName: 'Sree Test',
-      otp: '123456',
+      recipientEmail: '', // Send to yourself first
+      recipientName: '',
+      otp: '',
       subject: 'Test OTP - NodeJS Email Service',
       expiryMinutes: 10
     });

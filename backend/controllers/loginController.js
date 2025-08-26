@@ -1,4 +1,5 @@
 const Team = require("../models/Team");
+const {sendOTPEmail} = require("../config/emailService");
 
 const loginAdmin = async (req, res) => {
   try {
@@ -6,6 +7,7 @@ const loginAdmin = async (req, res) => {
     console.log("Received:", { teamName, otp, parsedOtp: parseInt(otp) });
 
     const team = await Team.findOne({ teamName: teamName });
+    console.log("DB result:", team?.teamName, team?.houseName);
     console.log("Query result:", team);
 
     if (!team) {
@@ -13,7 +15,7 @@ const loginAdmin = async (req, res) => {
     }
 
     if (team.otp === parseInt(otp)) {
-      return res.json({ success: true, message: "Login successful", team });
+      return res.json({ success: true, message: "Login successful", teamName:team.teamName,houseName:team.houseName });
     } else {
       return res.status(401).json({ success: false, message: "Invalid OTP" });
     }
@@ -77,6 +79,15 @@ const otpGen = async (req, res) => {
     // Store OTP in the team document
     team.otp = otp;
     await team.save();
+
+    //this is where the email is sent
+     await sendOTPEmail({
+      recipientEmail: email,
+      recipientName: team.teamName,
+      otp,
+      subject: "Your OTP for login",
+      expiryMinutes: 10
+    });
 
     // OTP is stored in DB; frontend doesn't see it
     return res.json({ success: true, message: "OTP generated successfully" });
