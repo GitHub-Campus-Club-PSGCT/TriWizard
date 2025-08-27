@@ -16,8 +16,11 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
+app.use(express.json());
 
 // Import combined routes
+const authRoutes = require("./routes/login");
+app.use("/api/auth", authRoutes);
 const routes = require("./routes");
 const loginRoute = require("./routes/login");
 app.use("/login", loginRoute);
@@ -33,4 +36,3 @@ app.use("/questions", questionRoutes);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
-
