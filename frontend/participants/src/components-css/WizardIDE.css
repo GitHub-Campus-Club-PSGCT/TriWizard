@@ -84,7 +84,7 @@
 /* ------------------ THEMES ------------------ */
 
 /* Gryffindor */
-.gryffindor {
+.Gryffindor {
   --bg: #1a0b0b;
   --panel: #2a0e0e;
   --border: #441414;
@@ -96,7 +96,7 @@
 }
 
 /* Hufflepuff */
-.hufflepuff {
+.Hufflepuff {
   --bg: #0c0c0a;
   --panel: #141412;
   --border: #2d2d27;
@@ -108,7 +108,7 @@
 }
 
 /* Ravenclaw */
-.ravenclaw {
+.Ravenclaw {
   --bg: #0a0e14;
   --panel: #0f141b;
   --border: #1d2a38;
@@ -120,7 +120,7 @@
 }
 
 /* Slytherin */
-.slytherin {
+.Slytherin {
   --bg: #070a09;
   --panel: #0f1412;
   --border: #203127;

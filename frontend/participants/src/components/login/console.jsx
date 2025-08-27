@@ -10,7 +10,7 @@ export default function WizardIDE() {
   const [testCases, setTestCases] = useState([]);
 
   const themeMap = {
-    "1": "gryffindor",
+    "1": "Gryffindor",
     "2": "Hufflepuff",
     "3": "Ravenclaw",
     "4": "Slytherin",
@@ -18,12 +18,16 @@ export default function WizardIDE() {
 
   // 🔹 Fetch buggy code & testcases
   useEffect(() => {
-    if (themeMap[1]) {
-      setTheme(themeMap[1]);
+    if (themeMap[housename]) {
+      setTheme(themeMap[housename]);
     }
+    else {
+    // Otherwise directly use housename (like "Hufflepuff")
+    setTheme(housename);
+  }
     const fetchBuggyCode = async () => {
       try {
-        const res = await fetch("http://localhost:8080/questions/Gryffindor/1");
+        const res = await fetch(`http://localhost:8080/questions/${housename}/${questionNumber}`);
         const data = await res.json();
 
         if (data && data.success && data.question) {
@@ -85,7 +89,7 @@ export default function WizardIDE() {
           {testCases.map((tc, i) => (
             <div key={i} className="testcase">
               <p><b>Input:</b> {tc.input}</p>
-              <p><b>Expected Output:</b> {tc.expected}</p>
+              <p><b>Expected Output:</b> {tc.expectedOutput}</p>
             </div>
           ))}
         </div>
