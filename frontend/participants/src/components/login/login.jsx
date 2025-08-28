@@ -4,15 +4,19 @@ import axios from "axios";
 import mapBackground from "../../assets/Images/LoginBG.png";
 import { useAuth } from "../../context/AuthContext";
 
+const api = axios.create({
+  baseURL: "http://localhost:8080",
+  withCredentials: true,
+});
+
 const STEPS = {
   EMAIL: "email",
   OTP: "otp",
   SUCCESS: "success",
-  CLEARED: "cleared",
 };
 
 const Snitch = React.memo(() => (
-  <svg className="snitch" viewBox="0 0 200 100">
+  <svg className="snitch" viewBox="0 0 200 100" aria-hidden>
     <g className="wings">
       <path className="wing" d="M50,50 Q20,20 0,50 Q20,80 50,50 Z" />
       <path className="wing" d="M150,50 Q180,20 200,50 Q180,80 150,50 Z" />
@@ -38,7 +42,7 @@ const SnitchDetailsModal = ({ onClose }) => (
 );
 
 export default function Login() {
-  const { login } = useAuth(); // ✅ use context login
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [teamName, setTeamName] = useState("");
@@ -51,8 +55,11 @@ export default function Login() {
 
   useEffect(() => {
     if (step === STEPS.SUCCESS) {
-      const timer = setTimeout(() => setStep(STEPS.CLEARED), 3500);
-      return () => clearTimeout(timer);
+      const t = setTimeout(() => {
+        // navigate to dashboard here
+        // e.g., navigate("/dashboard");
+      }, 1500);
+      return () => clearTimeout(t);
     }
   }, [step]);
 
@@ -60,10 +67,10 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://localhost:8080/login/otp-gen", { email });
+      await api.post("/api/auth/otp-gen", { email });
       setStep(STEPS.OTP);
     } catch (error) {
-      alert("Could not generate OTP, try again.");
+      alert(error?.response?.data?.message || "Could not generate OTP, try again.");
     } finally {
       setLoading(false);
     }
@@ -74,20 +81,25 @@ export default function Login() {
     const enteredOtp = otp.join("");
     if (enteredOtp.length < 6) return;
 
-    const user = await login(teamName, enteredOtp);
-    if (user) {
-      setAssignedHouse(user.houseName);
-      setTeamName(user.teamName);
-      setStep(STEPS.CLEARED);
+    const result = await login(teamName, enteredOtp);
+    if (result?.success) {
+      setAssignedHouse(result.houseName);
+      setTeamName(result.teamName);
+      setStep(STEPS.SUCCESS);
     } else {
-      alert("Wrong spell! Please try again.");
+      alert(result?.message || "Wrong spell! Please try again.");
     }
   };
 
   const handleOtpChange = (element, index) => {
-    if (isNaN(element.value)) return false;
-    setOtp([...otp.map((d, idx) => (idx === index ? element.value : d))]);
-    if (element.nextSibling && element.value) {
+    const val = element.value.replace(/\D/g, ""); // numeric only
+    if (!val && otp[index] && index > 0 && !element.value) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+    const next = [...otp];
+    next[index] = val.slice(-1);
+    setOtp(next);
+    if (val && element.nextSibling) {
       element.nextSibling.focus();
     }
   };
@@ -95,6 +107,12 @@ export default function Login() {
   const handleOtpKeyDown = (e, index) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       otpInputRefs.current[index - 1]?.focus();
+    }
+    if (e.key === "ArrowLeft" && index > 0) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+    if (e.key === "ArrowRight" && index < otp.length - 1) {
+      otpInputRefs.current[index + 1]?.focus();
     }
   };
 
@@ -111,8 +129,15 @@ export default function Login() {
             <h1 className="title">REVEAL YOUR<br />IDENTITY</h1>
             <p className="subtitle">Only the worthy may enter the castle grounds.</p>
             <form onSubmit={handleGetOtp} className="magical-form">
-              <input type="email" placeholder="Your magical signature (email)" className="input"
-                value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <input
+                type="email"
+                placeholder="Your magical signature (email)"
+                className="input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
               <button type="submit" className="btn" disabled={loading}>
                 {loading ? "Casting..." : "Cast Spell"}
               </button>
@@ -125,15 +150,31 @@ export default function Login() {
             <h1 className="title">The Final Incantation</h1>
             <p className="subtitle">Speak your team’s name and whisper the six secret runes.</p>
             <form onSubmit={handleVerifyOtp} className="magical-form">
-              <input type="text" placeholder="Your Team Name" className="input"
-                value={teamName} onChange={(e) => setTeamName(e.target.value)} required />
+              <input
+                type="text"
+                placeholder="Your Team Name"
+                className="input"
+                value={teamName}
+                onChange={(e) => setTeamName(e.target.value)}
+                required
+                autoComplete="off"
+              />
 
               <div className="otp-container">
                 {otp.map((data, index) => (
-                  <input key={index} type="text" className="otp-input" value={data} maxLength="1"
+                  <input
+                    key={index}
+                    type="text"
+                    inputMode="numeric"
+                    className="otp-input"
+                    value={data}
+                    maxLength="1"
                     onChange={(e) => handleOtpChange(e.target, index)}
                     onKeyDown={(e) => handleOtpKeyDown(e, index)}
-                    ref={(el) => (otpInputRefs.current[index] = el)} required />
+                    ref={(el) => (otpInputRefs.current[index] = el)}
+                    required
+                    aria-label={`OTP Digit ${index + 1}`}
+                  />
                 ))}
               </div>
               <button type="submit" className="btn">Unlock</button>
@@ -141,8 +182,8 @@ export default function Login() {
           </div>
         )}
 
-        {step === STEPS.CLEARED && (
-          <div className="sorting-container" key="cleared">
+        {step === STEPS.SUCCESS && (
+          <div className="sorting-container" key="success">
             <h1 className="title sorted-title">The Sorting Ceremony is Complete!</h1>
             <div className="house-banners">
               <div className={`banner gryffindor ${assignedHouse === "Gryffindor" ? "chosen" : ""}`}></div>
@@ -153,7 +194,10 @@ export default function Login() {
             <p className="subtitle success-subtitle">
               You belong to... <strong>{assignedHouse}!</strong>
             </p>
-            <button className="btn success-btn" onClick={() => alert("Navigating to the Great Hall dashboard!")}>
+            <button
+              className="btn success-btn"
+              onClick={() => alert("Navigating to the Great Hall dashboard!")}
+            >
               Enter the Great Hall
             </button>
           </div>

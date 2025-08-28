@@ -2,55 +2,69 @@ const Team = require("../models/Team");
 const { sendOTPEmail } = require("../config/emailService");
 const jwt = require("jsonwebtoken");
 
+const signAuthToken = (payload) =>
+  jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "5h" });
+
+const setAuthCookie = (res, token) => {
+  res.cookie("authToken", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 5 * 60 * 60 * 1000, // 5h
+  });
+};
+
 const loginAdmin = async (req, res) => {
   try {
     const { teamName, otp } = req.body;
-    console.log("Received:", { teamName, otp, parsedOtp: parseInt(otp) });
+
+    if (!teamName || !otp) {
+      return res.status(400).json({ success: false, message: "Missing credentials" });
+    }
 
     const team = await Team.findOne({ teamName: teamName });
-    console.log("DB result:", team?.teamName, team?.houseName);
-
     if (!team) {
       return res.status(401).json({ success: false, message: "Team not found" });
     }
 
-    if (team.otp === parseInt(otp)) {
-      const payload = {
-        teamName: team.teamName,
-        houseName: team.houseName,
-      };
-
-      const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "5h" });
-
-      return res.json({
-        success: true,
-        message: "Login successful",
-        teamName: team.teamName,
-        houseName: team.houseName,
-        token, // ✅ send token to frontend
-      });
-    } else {
+    // NOTE: ideally store a timestamp/expiry for OTP, and hash OTP.
+    if (String(team.otp) !== String(otp)) {
       return res.status(401).json({ success: false, message: "Invalid OTP" });
     }
+
+    const payload = { teamName: team.teamName, houseName: team.houseName };
+    const token = signAuthToken(payload);
+
+    // set httpOnly cookie
+    setAuthCookie(res, token);
+
+    // (optional) clear OTP after successful login
+    team.otp = undefined;
+    await team.save();
+
+    return res.json({
+      success: true,
+      message: "Login successful",
+      teamName: team.teamName,
+      houseName: team.houseName,
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
 const emailVerify = async (req, res) => {
   try {
     const { email } = req.body;
-    console.log("Received email:", email);
 
     if (!email || email.length < 6) {
       return res.status(400).json({ success: false, message: "Enter a valid email" });
     }
 
     const rollNumber = email.slice(0, 6);
-    console.log("Extracted rollNumber:", rollNumber);
-
     const team = await Team.findOne({ "members.rollNumber": rollNumber });
+
     if (!team) {
       return res.status(400).json({ success: false, message: "Enter a valid email" });
     }

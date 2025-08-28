@@ -1,14 +1,27 @@
 const express = require("express");
 const { loginAdmin, emailVerify, otpGen } = require("../controllers/loginController");
+const { authMiddleware } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
-// Admin login via OTP
+router.post("/otp-gen", otpGen);
+router.post("/email-verify", emailVerify);
 router.post("/otp-verify", loginAdmin);
 
-// Email verification
-router.post("/email-verify", emailVerify);
+router.get("/me", authMiddleware, (req, res) => {
+  res.json({
+    success: true,
+    user: { teamName: req.teamName, houseName: req.houseName },
+  });
+});
 
-router.post("/otp-gen", otpGen);
+router.post("/logout", (req, res) => {
+  res.clearCookie("authToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+  res.json({ success: true, message: "Logged out successfully" });
+});
 
 module.exports = router;
