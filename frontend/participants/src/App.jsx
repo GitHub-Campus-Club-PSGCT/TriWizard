@@ -12,7 +12,7 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/ide" element={<WizardIDE />} />
+          <Route path="/ide/:housename/:questionNumber" element={<WizardIDE />} />
         </Routes>
       </AuthProvider>
     </Router>
