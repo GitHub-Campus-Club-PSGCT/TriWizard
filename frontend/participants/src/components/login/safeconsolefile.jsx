@@ -1,16 +1,14 @@
 import "../../components-css/WizardIDE.css";
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import Editor from "@monaco-editor/react";
 
 export default function WizardIDE() {
-  const { housename, questionNumber } = useParams(); // housename can be "1", "2", etc.
-  const [theme, setTheme] = useState(""); 
+  const { housename, questionNumber } = useParams(); // 👈 from /:housename/:questionNumber
+  const [theme, setTheme] = useState(housename); // auto theme = housename
   const [code, setCode] = useState("// Loading question...");
   const [output, setOutput] = useState("Result will appear here...");
   const [testCases, setTestCases] = useState([]);
 
-  // 🔹 Number-to-theme mapping
   const themeMap = {
     "1": "Gryffindor",
     "2": "Hufflepuff",
@@ -20,24 +18,27 @@ export default function WizardIDE() {
 
   // 🔹 Fetch buggy code & testcases
   useEffect(() => {
-    setTheme(themeMap[housename] || housename); // Map number to theme
-
+    if (themeMap[1]) {
+      setTheme(themeMap[1]);
+    }
+    else {
+    // Otherwise directly use housename (like "Hufflepuff")
+    setTheme(housename);
+  }
     const fetchBuggyCode = async () => {
       try {
-        const res = await fetch(
-          `http://localhost:8080/questions/${themeMap[housename] || housename}/${questionNumber}`
-        );
+        const res = await fetch(`http://localhost:8080/questions/Gryffindor/2`);
         const data = await res.json();
 
         if (data && data.success && data.question) {
-          setCode(data.question.buggedCode || "// No buggy code found");
+          setCode(data.question.buggedCode);
           setTestCases(data.question.testCases || []);
         } else {
-          setCode("// ⚠ No buggy code found for this question.");
+          setCode("// No buggy code found for this question.");
         }
+
       } catch (err) {
         setCode("// ⚠ Error fetching buggy code.");
-        console.error(err);
       }
     };
 
@@ -61,20 +62,19 @@ export default function WizardIDE() {
 
   return (
     <div className={`wizard-ide ${theme}`}>
+      {/* Top Bar with Theme */}
       <div className="topbar">
         <h2>
-          Wizard IDE 🪄 – {theme} | Question {questionNumber}
+          Wizard IDE 🪄 – {housename} | Question {questionNumber}
         </h2>
+        <p className="theme-label">Theme: {theme}</p>
       </div>
 
-      {/* Monaco Editor */}
-      <Editor
-        height="400px"
-        defaultLanguage="c"
-        theme="vs-dark"
+      {/* Code Editor */}
+      <textarea
+        className="editor"
         value={code}
-        onChange={(value) => setCode(value || "")}
-        options={{ fontSize: 14, minimap: { enabled: false }, automaticLayout: true }}
+        onChange={(e) => setCode(e.target.value)}
       />
 
       {/* Run Button */}
@@ -82,7 +82,7 @@ export default function WizardIDE() {
         ▶ Run
       </button>
 
-      {/* Test Cases */}
+      {/* ✅ Testcases Display */}
       {testCases.length > 0 && (
         <div className="testcase-box">
           <h3>Test Cases</h3>
@@ -95,7 +95,7 @@ export default function WizardIDE() {
         </div>
       )}
 
-      {/* Output */}
+      {/* Output Section */}
       <div className="output">
         <h3>Your Output</h3>
         <pre>{output}</pre>
