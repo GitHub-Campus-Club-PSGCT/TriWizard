@@ -29,7 +29,7 @@ const createTeam = async (req, res) => {
       teamId,
       teamName,
       members,
-      houseName,
+      houseName: "unknown",
       otp: null,
       testCasesPassed: [],
       score: null
@@ -43,6 +43,34 @@ const createTeam = async (req, res) => {
   }
 };
 
+//Update House by Roll Number
+const updateHouseByRollNumber = async (req, res) => {
+  try {
+    const { rollNumber, houseName } = req.body;
+
+    if (!rollNumber || !houseName) {
+      return res.status(400).json({ success: false, message: "Roll number and house name are required" });
+    }
+
+    // Find the team containing the roll number
+    const team = await Team.findOne({ "members.rollNumber": rollNumber });
+
+    if (!team) {
+      return res.status(404).json({ success: false, message: "Team not found for this roll number" });
+    }
+
+    // Update houseName
+    team.houseName = houseName;
+    await team.save();
+
+    res.json({ success: true, message: `House updated to ${houseName} for team ${team.teamName}`, team });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+// Get Teams by House Name
 const getTeamsByHouse = async (req, res) => {
   try {
     const { houseName } = req.params;
@@ -70,5 +98,5 @@ const getTeamsByHouse = async (req, res) => {
   }
 };
 
-// 👇 Export BOTH
-module.exports = { createTeam, getTeamsByHouse };
+// 👇 Export ALL
+module.exports = { createTeam, updateHouseByRollNumber, getTeamsByHouse };
