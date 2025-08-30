@@ -5,7 +5,7 @@ const express = require("express");
 const connectDB = require("./config/db");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const mongoose = require("mongoose");
+// const mongoose = require("mongoose");
 const { exec } = require("child_process");
 const fs = require("fs");
 const path = require("path");
@@ -13,7 +13,7 @@ const path = require("path");
 const app = express();
 
 // Connect DB once
-connectDB();
+// connectDB();
 
 // Middleware
 app.use(express.json());
@@ -52,18 +52,24 @@ app.post("/submit", async (req, res) => {
 
 // Run submitted code inside Docker
 app.post("/run-code", (req, res) => {
+  //when there are concurrent requests, there will be an issue. 
   const { code } = req.body;
-
+  // to handle concurrent requests use some submission ids or use team_id. For example <team_id_submitted.c> for the filename. 
   const filePath = path.join(__dirname, "submitted.c");
   fs.writeFileSync(filePath, code);
 
-  const command = `docker run --rm -v ${__dirname}:/app -w /app gcc:latest sh -c "gcc submitted.c -o submitted && ./submitted"`;
+  let command;
+  if (process.platform === "win32") {
+    command = "gcc submitted.c -o submitted && submitted";
+  } else {
+    command = "gcc submitted.c -o submitted && ./submitted";
+  }
 
   exec(command, (error, stdout, stderr) => {
     if (error) {
       return res.json({
         success: false,
-        error: stderr || error.message,
+        error: stderr || error.message
       });
     }
     res.json({ success: true, output: stdout });
@@ -71,13 +77,14 @@ app.post("/run-code", (req, res) => {
 });
 
 // Secondary Mongo connection (if you're using connectDB already, you can remove this)
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+// commented this as we are already calling the connectDB() function at the beginning of this file
+// mongoose
+//   .connect(process.env.MONGO_URI, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//   })
+//   .then(() => console.log("✅ MongoDB connected"))
+//   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // Health check
 app.get("/", (req, res) => {
@@ -85,7 +92,7 @@ app.get("/", (req, res) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
   console.log(`✅ Server running on http://localhost:${PORT}`)
 );
