@@ -76,7 +76,7 @@ app.post("/run-code", (req, res) => {
 
 
 const Question = require("./models/Question");
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect("mongodb+srv://subhasubbiah7:FYuFc4fEtFCv2AYd@cluster0.pqss5ak.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
