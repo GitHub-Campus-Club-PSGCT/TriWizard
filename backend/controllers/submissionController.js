@@ -1,7 +1,10 @@
 const Submission = require("../models/Submission");
 const Question = require("../models/Question"); // optional: to validate question exists
-const { runSubmission } = require("../utils/codeRunner");
+//const { runSubmission } = require("../utils/codeRunner");
+const axios = require("axios");
+require("dotenv").config();
 
+const COMPILER_URL = process.env.COMPILER_URL;
 const createSubmission = async (req, res) => {
   try {
     const { questionId, teamId, language = "c", code } = req.body;
@@ -25,10 +28,49 @@ const createSubmission = async (req, res) => {
 
     await submission.save();
 
-    // Run async
-    runSubmission(submission._id);
+    // Prepare request body for remote compiler
+    const requestBody = {
+      code,
+      testCases: question.testCases,
+      submissionid: submission._id.toString()
+    };
 
-    res.status(201).json({ success: true, submissionId: submission._id });
+  let results = [];
+  let passedAll = true;
+  let error = null;
+  let testcasesPassed = 0;
+
+    try {
+      const response = await axios.post(COMPILER_URL, requestBody, { timeout: 10000 });
+      if (response.data.results) {
+        results = response.data.results.map(tc => ({
+          input: tc.input,
+          expectedOutput: tc.expectedOutput,
+          actualOutput: tc.actualOutput,
+          passed: tc.passed
+        }));
+        testcasesPassed = results.filter(r => r.passed).length;
+        passedAll = results.every(r => r.passed);
+        submission.status = "done";
+        submission.results = results;
+        submission.passedAll = passedAll;
+        submission.error = null;
+      } else if (response.data.error) {
+        submission.status = "error";
+        submission.error = response.data.error;
+        submission.results = [];
+        submission.passedAll = false;
+      }
+    } catch (err) {
+      submission.status = "error";
+      submission.error = err.response?.data?.error || err.message;
+      submission.results = [];
+      submission.passedAll = false;
+    }
+
+  await submission.save();
+
+  res.status(201).json({ success: true, submission, testcasesPassed, testcasesTotal: question.testCases.length });
   } catch (err) {
     console.error("createSubmission error:", err);
     res.status(500).json({ success: false, message: "Server error" });
