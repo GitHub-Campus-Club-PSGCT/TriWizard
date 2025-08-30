@@ -70,7 +70,7 @@ export default function Login() {
       // ⭐ Save email locally so OTP step can retrieve it later
       localStorage.setItem("email", email);
 
-      await api.post("/api/auth/otp-gen", { email });
+      await api.post("/login/otp-gen", { email });
       setStep(STEPS.OTP);
     } catch (error) {
       alert(error?.response?.data?.message || "Could not generate OTP, try again.");
@@ -96,12 +96,18 @@ export default function Login() {
   const rollNumber = savedEmail.split("@")[0].toLowerCase(); // ensure case-insensitive
 
   try {
-    await api.post("/api/auth/otp-verify", {
+    const res = await api.post("/login/otp-verify", {
       rollNumber,
       otp: enteredOtp,
     });
 
-    alert("OTP verified successfully!");
+    if (res.data && res.data.houseName) {
+      alert("OTP verified successfully!");
+      setAssignedHouse(res.data.houseName);
+      setStep(STEPS.SUCCESS);
+    } else {
+      alert("OTP verified but no house assigned.");
+    }
     // proceed to next step, e.g., dashboard
   } catch (error) {
     alert(error?.response?.data?.message || "OTP verification failed");
