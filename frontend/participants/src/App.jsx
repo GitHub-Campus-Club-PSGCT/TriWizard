@@ -21,6 +21,7 @@ function App() {
           <Route path="/gryffindor/map" element={<Gmap />} />
           <Route path="/slytherin/map" element={<Smap />} />
           <Route path="/ravenclaw/map" element={<Rmap />} />
+          <Route path="/ide/:housename/:questionNumber" element={<WizardIDE />} />
         </Routes>
       </AuthProvider>
     </Router>
