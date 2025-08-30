@@ -33,6 +33,7 @@ app.use(
 
 // Routes (keep all your existing routes)
 app.use("/api/auth", require("./routes/login"));
+
 app.use("/api/email", require("./routes/emailRoutes"));
 app.use("/admin", require("./routes/admin"));
 app.use("/questions", require("./routes/questions"));
