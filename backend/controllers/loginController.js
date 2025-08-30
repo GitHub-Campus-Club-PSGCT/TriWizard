@@ -40,8 +40,8 @@ const loginAdmin = async (req, res) => {
     setAuthCookie(res, token);
 
     // clear OTP after login
-    team.otp = undefined;
-    await team.save();
+    //team.otp = undefined;
+    //await team.save();
 
     return res.json({
       success: true,
