@@ -1,3 +1,4 @@
+// controllers/teamController.js
 const Team = require("../models/Team");
 const Counter = require("../models/Counter");
 
@@ -12,7 +13,7 @@ const getNextTeamId = async () => {
 };
 
 // Create Team
-exports.createTeam = async (req, res) => {
+const createTeam = async (req, res) => {
   try {
     console.log("Incoming body:", req.body);
 
@@ -41,3 +42,33 @@ exports.createTeam = async (req, res) => {
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
+
+const getTeamsByHouse = async (req, res) => {
+  try {
+    const { houseName } = req.params;
+
+    if (!houseName) {
+      return res.status(400).json({ success: false, message: "House name is required" });
+    }
+
+    const teams = await Team.find({
+      houseName: { $regex: new RegExp(`^${houseName}$`, "i") },
+    }).select("teamName score houseName");
+
+    if (!teams || teams.length === 0) {
+      return res.status(404).json({ success: false, message: "No teams found for this house" });
+    }
+
+    return res.json({
+      success: true,
+      houseName,
+      teams,
+    });
+  } catch (err) {
+    console.error("Error fetching teams:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// 👇 Export BOTH
+module.exports = { createTeam, getTeamsByHouse };
