@@ -16,29 +16,30 @@ const setAuthCookie = (res, token) => {
 
 const loginAdmin = async (req, res) => {
   try {
-    const { teamName, otp } = req.body;
+    const { rollNumber, otp } = req.body;
 
-    if (!teamName || !otp) {
+    if (!rollNumber || !otp) {
       return res.status(400).json({ success: false, message: "Missing credentials" });
     }
 
-    const team = await Team.findOne({ teamName: teamName });
+    const team = await Team.findOne({
+      "members.rollNumber": { $regex: new RegExp(`^${rollNumber}$`, "i") }
+    });
+
     if (!team) {
       return res.status(401).json({ success: false, message: "Team not found" });
     }
 
-    // NOTE: ideally store a timestamp/expiry for OTP, and hash OTP.
     if (String(team.otp) !== String(otp)) {
       return res.status(401).json({ success: false, message: "Invalid OTP" });
     }
 
+    // successful login
     const payload = { teamName: team.teamName, houseName: team.houseName };
     const token = signAuthToken(payload);
-
-    // set httpOnly cookie
     setAuthCookie(res, token);
 
-    // (optional) clear OTP after successful login
+    // clear OTP after login
     team.otp = undefined;
     await team.save();
 
@@ -53,6 +54,7 @@ const loginAdmin = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 const emailVerify = async (req, res) => {
   try {
@@ -84,8 +86,10 @@ const otpGen = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid email" });
     }
 
-    const rollNumber = email.slice(0, 6);
-    const team = await Team.findOne({ "members.rollNumber": rollNumber });
+    const rollNumber = email.slice(0, 6).toLowerCase(); // case-insensitive
+    const team = await Team.findOne({ 
+      "members.rollNumber": { $regex: new RegExp(`^${rollNumber}$`, "i") }
+    });
 
     if (!team) {
       return res.status(404).json({ success: false, message: "Team not found" });
@@ -95,6 +99,7 @@ const otpGen = async (req, res) => {
     team.otp = otp;
     await team.save();
 
+    // send email with OTP
     await sendOTPEmail({
       recipientEmail: email,
       recipientName: team.teamName,
@@ -103,11 +108,16 @@ const otpGen = async (req, res) => {
       expiryMinutes: 10,
     });
 
-    return res.json({ success: true, message: "OTP generated successfully" });
+    return res.json({
+      success: true,
+      message: "OTP generated successfully",
+      rollNumber // 👈 frontend stores this and sends it back later
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 module.exports = { loginAdmin, emailVerify, otpGen };
