@@ -1,7 +1,7 @@
 import "../../components-css/WizardIDE.css";
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import Editor from "@monaco-editor/react";
+//import Editor from "@monaco-editor/react";
 
 export default function WizardIDE() {
   const { housename, questionNumber } = useParams(); // housename can be "1", "2", etc.
