@@ -67,6 +67,17 @@ app.post("/run-code", (req,res)=>{
   });
 });
 
+const Question = require("./models/Question");
+mongoose.connect("mongodb+srv://subhasubbiah7:FYuFc4fEtFCv2AYd@cluster0.pqss5ak.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("MongoDB connected"))
+.catch((err) => console.error("MongoDB connection error:", err));
+
+const codeRunnerRoutes = require("./routes/codeRunner");
+app.use("/", codeRunnerRoutes);
+
 // Health check
 app.get("/", (req,res)=> res.send("Hello from server 🚀"));
 
