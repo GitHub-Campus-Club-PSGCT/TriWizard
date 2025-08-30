@@ -1,0 +1,120 @@
+.rules-container {
+  height: 100vh;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;  /* centers the dialogue box */
+  gap: 40px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+
+  /* Dim background */
+  background-color: rgba(0, 0, 0, 0.6);
+  background-blend-mode: darken;
+}
+
+/* Dumbledore fixed to bottom */
+.dumbledore {
+  position: absolute;
+  bottom: -100px;
+  left: 5%; /* adjust how close he is to box */
+}
+
+.dumbledore-sticker {
+  height: 100vh;
+  object-fit: contain;
+  filter: drop-shadow(0px 0px 25px #000);
+}
+
+/* Fantasy dialogue box (floating in center) */
+.dialogue-box {
+  background: url("https://www.transparenttextures.com/patterns/aged-paper.png"),
+              linear-gradient(135deg, rgba(255,248,220,0.95), rgba(245,222,179,0.9));
+  border: 4px solid #d4af37;
+  border-radius: 20px;
+  padding: 25px 30px;
+  width: 500px;
+  max-height: 70vh;
+  overflow-y: auto;
+
+  box-shadow: 0px 0px 25px rgba(212, 175, 55, 0.7), 0px 0px 50px rgba(0,0,0,0.6);
+  font-family: "Cinzel", serif;
+  color: #2e1c14;
+  line-height: 1.6;
+  text-align: justify;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.dialogue-box:hover {
+  transform: scale(1.02);
+}
+.dialogue-box h2{
+    text-align: center;
+}
+.click-hint{
+    font-style: italic;
+  font-family: "Garamond", serif; /* or whatever font family you want */
+  font-size: 16px;
+  color: #616161;  /* parchment-like color */
+  text-align: center;
+  margin-top: 10px;
+
+}
+.next-btn {
+  margin-top: 20px;
+  padding: 10px 25px;
+  font-size: 18px;
+  font-family: "Cinzel Decorative", serif;
+  background: linear-gradient(135deg, #c19a6b, #8b5e3c);
+  color: #fff8dc;
+  border: 2px solid #5a3825;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+.next-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.6);
+}
+.next-btn {
+  margin-top: 20px;
+  padding: 10px 25px;
+  font-size: 18px;
+  font-family: "Cinzel Decorative", serif;
+  background: linear-gradient(135deg, #c19a6b, #8b5e3c);
+  color: #fff8dc;
+  border: 2px solid #5a3825;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+.next-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.6);
+}
+.next-btn {
+  margin-top: 20px;
+  padding: 10px 25px;
+  font-size: 18px;
+  font-family: "Cinzel Decorative", serif;
+  background: linear-gradient(135deg, #c19a6b, #8b5e3c);
+  color: #fff8dc;
+  border: 2px solid #5a3825;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+.next-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.6);
+}
