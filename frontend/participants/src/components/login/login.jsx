@@ -45,7 +45,7 @@ export default function Login() {
   const { login } = useAuth();
 
   const [email, setEmail] = useState("");
-  const [teamName, setTeamName] = useState("");
+  //const [teamName, setTeamName] = useState("");
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const [step, setStep] = useState(STEPS.EMAIL);
   const [loading, setLoading] = useState(false);
@@ -67,6 +67,9 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
+      // ⭐ Save email locally so OTP step can retrieve it later
+      localStorage.setItem("email", email);
+
       await api.post("/api/auth/otp-gen", { email });
       setStep(STEPS.OTP);
     } catch (error) {
@@ -77,19 +80,34 @@ export default function Login() {
   };
 
   const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    const enteredOtp = otp.join("");
-    if (enteredOtp.length < 6) return;
+  e.preventDefault();
+  const enteredOtp = otp.join("");
+  if (enteredOtp.length < 6) return;
 
-    const result = await login(teamName, enteredOtp);
-    if (result?.success) {
-      setAssignedHouse(result.houseName);
-      setTeamName(result.teamName);
-      setStep(STEPS.SUCCESS);
-    } else {
-      alert(result?.message || "Wrong spell! Please try again.");
-    }
-  };
+  // ⭐ Retrieve stored email and derive rollNumber (case-insensitive)
+  const savedEmail = localStorage.getItem("email");
+  if (!savedEmail) {
+    alert("Email not found. Please go back and enter your email again.");
+    setStep(STEPS.EMAIL);
+    return;
+  }
+
+  // 👉 Extract roll number from email before "@"
+  const rollNumber = savedEmail.split("@")[0].toLowerCase(); // ensure case-insensitive
+
+  try {
+    await api.post("/api/auth/otp-verify", {
+      rollNumber,
+      otp: enteredOtp,
+    });
+
+    alert("OTP verified successfully!");
+    // proceed to next step, e.g., dashboard
+  } catch (error) {
+    alert(error?.response?.data?.message || "OTP verification failed");
+  }
+};
+
 
   const handleOtpChange = (element, index) => {
     const val = element.value.replace(/\D/g, ""); // numeric only
@@ -148,17 +166,8 @@ export default function Login() {
         {step === STEPS.OTP && (
           <div className="step-container" key="otp">
             <h1 className="title">The Final Incantation</h1>
-            <p className="subtitle">Speak your team’s name and whisper the six secret runes.</p>
+            <p className="subtitle">Whisper the six secret runes.</p>
             <form onSubmit={handleVerifyOtp} className="magical-form">
-              <input
-                type="text"
-                placeholder="Your Team Name"
-                className="input"
-                value={teamName}
-                onChange={(e) => setTeamName(e.target.value)}
-                required
-                autoComplete="off"
-              />
 
               <div className="otp-container">
                 {otp.map((data, index) => (
