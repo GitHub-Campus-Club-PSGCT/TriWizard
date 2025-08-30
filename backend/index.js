@@ -13,7 +13,7 @@ const path = require("path");
 const app = express();
 
 // Connect DB once
-// connectDB();
+connectDB();
 
 // Middleware
 app.use(express.json());
