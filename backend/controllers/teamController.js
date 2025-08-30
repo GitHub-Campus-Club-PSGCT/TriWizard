@@ -17,9 +17,9 @@ const createTeam = async (req, res) => {
   try {
     console.log("Incoming body:", req.body);
 
-    const { teamName, members, houseName } = req.body;
+    const { teamName, members } = req.body;
 
-    if (!teamName || !members || !houseName) {
+    if (!teamName || !members ) {
       return res.status(400).json({ success: false, message: "Missing required fields" });
     }
 
@@ -32,7 +32,7 @@ const createTeam = async (req, res) => {
       houseName: "unknown",
       otp: null,
       testCasesPassed: [],
-      score: null
+      score: 0
     });
 
     await newTeam.save();
