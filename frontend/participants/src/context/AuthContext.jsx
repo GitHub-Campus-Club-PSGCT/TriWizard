@@ -1,77 +1,68 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import axios from "axios";
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const navigate = useNavigate();
+const api = axios.create({
+  baseURL: "http://localhost:8080",
+  withCredentials: true, // send/receive httpOnly cookies
+});
 
-  const [token, setToken] = useState(localStorage.getItem('authToken'));
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem('authToken');
-    if (storedToken) {
-      try {
-        const decodedUser = jwtDecode(storedToken);
-        if (decodedUser.exp * 1000 < Date.now()) {
-          localStorage.removeItem('authToken');
-          setToken(null);
-          setUser(null);
-        } else {
-          setUser(decodedUser);
-          setToken(storedToken);
-        }
-      } catch (error) {
-        localStorage.removeItem('authToken');
+  const fetchUser = useCallback(async () => {
+    try {
+      const res = await api.get("/api/auth/me");
+      if (res.data?.success) {
+        setUser(res.data.user);
+      } else {
+        setUser(null);
       }
+    } catch {
+      setUser(null);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
-  const login = async (email, otp) => {
-    try {
-      const response = await axios.post("http://localhost:8080/login/otp-verify", {
-        teamName: email,
-        otp: otp
-      });
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
 
-      if (response.data.success && response.data.token) {
-        const receivedToken = response.data.token;
-        localStorage.setItem('authToken', receivedToken);
-        const decodedUser = jwtDecode(receivedToken);
-        
-        setUser(decodedUser);
-        setToken(receivedToken);
-        
-        return decodedUser;
+  async function login(teamName, otp) {
+    try {
+      const res = await api.post("/api/auth/otp-verify", { teamName, otp });
+      if (res.data?.success) {
+        // Do NOT read or store JWT on FE. Cookie is already set by server.
+        await fetchUser(); // confirm session from server
+        return res.data;   // contains teamName/houseName for immediate UI if needed
       }
       return null;
-    } catch (error) {
-      console.error("Login failed:", error);
+    } catch (err) {
+      console.error("Login failed", err);
       return null;
     }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('authToken');
-    setUser(null);
-    setToken(null);
-    navigate('/login');
-  };
-
-  const value = { user, token, loading, login, logout };
-
-  if (loading) {
-    return <div>Loading Application...</div>;
   }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
+  async function logout() {
+    try {
+      await api.post("/api/auth/logout");
+    } catch (err) {
+      console.error("Logout failed", err);
+    } finally {
+      setUser(null);
+    }
+  }
 
-export const useAuth = () => {
+  return (
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
   return useContext(AuthContext);
-};
+}

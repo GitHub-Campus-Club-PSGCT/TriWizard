@@ -18,10 +18,10 @@ router.post("/run-code/:questionNumber", async (req, res) => {
     }
 
     // temp file
-    const filePath = path.join(__dirname, "../temp/solution.c");
+    const filePath = path.join(__dirname, "..\\temp\\solution.c");
     fs.writeFileSync(filePath, code);
 
-    exec(`docker run --rm -v ${filePath}:/app/solution.c gcc sh -c "gcc /app/solution.c -o /app/solution && /app/solution"`, 
+    exec(`docker run --rm -v ${dockerPath}:\\app/solution.c gcc sh -c "gcc \\app/solution.c -o \\app/solution && \\app/solution"`, 
       (error, stdout, stderr) => {
         if (error) {
           return res.json({ success: false, error: stderr || error.message });
