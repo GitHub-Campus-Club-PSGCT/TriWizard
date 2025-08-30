@@ -1,0 +1,124 @@
+/* --- Page Layout --- */
+.map-page {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column; /* navbar on top */
+  background: #0c0c0c;
+  overflow: hidden;
+}
+
+/* --- Navbar (Hufflepuff Harry Potter Style) --- */
+.navbar {
+  width: 100%;
+  height: 70px;
+  background: linear-gradient(to right, #000000, #1a1a1a);
+  border-bottom: 3px solid gold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+  box-sizing: border-box;
+  color: gold;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.5rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+}
+
+/* Left logo (house name) */
+.nav-logo {
+  font-weight: bold;
+  letter-spacing: 3px;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+}
+
+/* Right buttons */
+.nav-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.nav-actions button {
+  background: rgba(255, 215, 0, 0.1);
+  border: 2px solid gold;
+  color: gold;
+  font-size: 1rem;
+  font-family: 'Georgia', serif;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-actions button:hover {
+  background: gold;
+  color: black;
+  box-shadow: 0 0 10px gold;
+}
+
+/* --- Map Container --- */
+.map-container {
+  position: relative;
+  width: 100vw;
+  height: calc(100vh - 70px); /* start below navbar */
+  margin-top: 70px; /* push content down */
+  background: #000; /* fallback bg */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.map-image {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* 🔥 Fix zoom/stretch */
+}
+
+/* --- Hotspots --- */
+.map-hotspot {
+  position: absolute;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.map-hotspot::before,
+.map-hotspot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(255, 215, 0, 0.8);
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.map-hotspot:hover::before {
+  animation: rippleEffect 2s linear infinite;
+}
+
+.map-hotspot:hover::after {
+  animation: rippleEffect 2s linear infinite;
+  animation-delay: 1s;
+}
+
+@keyframes rippleEffect {
+  0% {
+    width: 100%;
+    height: 100%;
+    opacity: 0.8;
+  }
+  100% {
+    width: 300%;
+    height: 300%;
+    opacity: 0;
+  }
+}
