@@ -12,7 +12,6 @@ import Gmap from './components/Gryffindor/Gmap';
 import Smap from './components/Slytherin/Smap';
 import Rmap from './components/Ravenclaw/Rmap';
 
-
 import './App.css';
 
 function App() {
