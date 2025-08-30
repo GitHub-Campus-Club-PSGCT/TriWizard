@@ -8,9 +8,9 @@ const signAuthToken = (payload) =>
 const setAuthCookie = (res, token) => {
   res.cookie("authToken", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 5 * 60 * 60 * 1000, // 5h
+    secure: false,                // stays false for localhost dev
+    sameSite: "None",             // ❌ was Lax → not sent cross-site
+    maxAge: 5 * 60 * 60 * 1000,
   });
 };
 
