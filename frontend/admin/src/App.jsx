@@ -1,5 +1,6 @@
 import React, { useState, createContext, useContext } from 'react';
 import { ChevronLeft, Users, BookOpen, Home, Wand2, Star, Crown, Trophy, Plus, Minus, LogIn, LogOut, Send } from 'lucide-react';
+import axios from 'axios';
 
 // Context for global state management
 const AppContext = createContext();
@@ -678,25 +679,38 @@ const QuestionsPage = ({ setCurrentRoute }) => {
   const [testCases, setTestCases] = useState('');
   const [expectedResult, setExpectedResult] = useState('');
 
+  useEffect(() => {
+    axios.get("http://localhost:8080/adminQuestions").then(res=> setQuestions(res.data)).catch(err=> console.error("Error fetching questions:", err));
+  },[]);
+
   const handleSubmit = () => {
     if (question.trim() && code.trim() && testCases.trim() && expectedResult.trim()) {
       const newQuestion = {
-        id: Date.now(),
         question: question,
         code: code,
         testCases: testCases,
         expectedResult: expectedResult
       };
-      setQuestions([...questions, newQuestion]);
-      setQuestion('');
-      setCode('');
-      setTestCases('');
-      setExpectedResult('');
-      alert('Question added to the magical tome!');
-    } else {
-      alert('Please fill in all fields');
-    }
-  };
+
+      //Post to backend
+      axios.post("http://localhost:8080/adminQuestions", newQuestion)
+      .then(res => {
+        setQuestions([...questions, res.data]); // use backend _id
+        setQuestion('');
+        setCode('');
+        setTestCases('');
+        setExpectedResult('');
+        alert('Question added to the magical tome!');
+      })
+      .catch(err => {
+        console.error("Error adding question:", err);
+        alert('Failed to add question, check console for details.');
+      });
+  } else {
+    alert('Please fill in all fields');
+  }
+};
+
 
   return (
     <div className="min-h-screen p-6 pt-2">
