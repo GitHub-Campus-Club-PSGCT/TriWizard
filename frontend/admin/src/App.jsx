@@ -1,7 +1,6 @@
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { ChevronLeft, Users, BookOpen, Home, Wand2, Star, Crown, Trophy, Plus, Minus, LogIn, LogOut, Send } from 'lucide-react';
-import axios from 'axios';
-
+import api from "./api";
 // Context for global state management
 const AppContext = createContext();
 
@@ -9,19 +8,27 @@ const AppProvider = ({ children }) => {
   const [teams, setTeams] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [houseAssignments, setHouseAssignments] = useState([]);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // Load once from localStorage (or default to false)
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const saved = localStorage.getItem("isAuthenticated");
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  // Save to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("isAuthenticated", JSON.stringify(isAuthenticated));
+  }, [isAuthenticated]);
 
   return (
-    <AppContext.Provider value={{
-      teams, setTeams,
-      questions, setQuestions,
-      houseAssignments, setHouseAssignments,
-      isAuthenticated, setIsAuthenticated
-    }}>
+    <AppContext.Provider
+      value={{ teams, setTeams, questions, setQuestions, houseAssignments, setHouseAssignments, isAuthenticated, setIsAuthenticated }}
+    >
       {children}
     </AppContext.Provider>
   );
 };
+
 
 const useAppContext = () => useContext(AppContext);
 
@@ -297,14 +304,15 @@ const LoginPage = ({ setCurrentRoute }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    if (username === 'ghccadmin' && password === 'ghcc@25') {
-      setIsAuthenticated(true);
-      setCurrentRoute('home');
-    } else {
-      alert('Invalid username or password!');
-    }
-  };
+ const handleLogin = () => {
+  if (username === 'ghccadmin' && password === 'ghcc@25') {
+    setIsAuthenticated(true);
+    setCurrentRoute('home');
+  } else {
+    alert('Invalid username or password!');
+  }
+};
+
 
   return (
     <ParchmentBackground>
@@ -579,26 +587,36 @@ const TeamsPage = ({ setCurrentRoute }) => {
     setStudents(newStudents);
   };
 
-  const handleSubmit = () => {
-    if (teamName.trim() && students.every(s => s.name.trim() && s.rollNumber.trim())) {
-      const newTeam = {
-        id: Date.now(),
-        name: teamName,
-        students: students,
-        score: 0
-      };
-      setTeams([...teams, newTeam]);
-      setTeamName('');
-      setStudents([
-        { name: '', rollNumber: '' },
-        { name: '', rollNumber: '' },
-        { name: '', rollNumber: '' }
-      ]);
-      alert('Team created successfully!');
-    } else {
-      alert('Please fill in all fields');
+  const handleSubmit = async () => {
+  if (teamName.trim() && students.every(s => s.name.trim() && s.rollNumber.trim())) {
+    const newTeam = {
+      teamName: teamName,
+      members: students.map(s => ({
+        rollNumber: s.rollNumber,
+        name: s.name
+      }))
+    };
+
+    try {
+      const response = await api.post("/admin", newTeam);
+      setTeams([...teams, response.data]); 
+      alert("Team created successfully!");
+      setCurrentRoute("home");
+    } catch (error) {
+      console.error("Error creating team:", error);
+      alert("Failed to create team");
     }
-  };
+
+    setTeamName("");
+    setStudents([
+      { name: "", rollNumber: "" },
+      { name: "", rollNumber: "" },
+      { name: "", rollNumber: "" }
+    ]);
+  } else {
+    alert("Please fill in all fields");
+  }
+};
 
   return (
     <div className="min-h-screen p-6 pt-2">
@@ -679,38 +697,25 @@ const QuestionsPage = ({ setCurrentRoute }) => {
   const [testCases, setTestCases] = useState('');
   const [expectedResult, setExpectedResult] = useState('');
 
-  useEffect(() => {
-    axios.get("http://localhost:8080/adminQuestions").then(res=> setQuestions(res.data)).catch(err=> console.error("Error fetching questions:", err));
-  },[]);
-
   const handleSubmit = () => {
     if (question.trim() && code.trim() && testCases.trim() && expectedResult.trim()) {
       const newQuestion = {
+        id: Date.now(),
         question: question,
         code: code,
         testCases: testCases,
         expectedResult: expectedResult
       };
-
-      //Post to backend
-      axios.post("http://localhost:8080/adminQuestions", newQuestion)
-      .then(res => {
-        setQuestions([...questions, res.data]); // use backend _id
-        setQuestion('');
-        setCode('');
-        setTestCases('');
-        setExpectedResult('');
-        alert('Question added to the magical tome!');
-      })
-      .catch(err => {
-        console.error("Error adding question:", err);
-        alert('Failed to add question, check console for details.');
-      });
-  } else {
-    alert('Please fill in all fields');
-  }
-};
-
+      setQuestions([...questions, newQuestion]);
+      setQuestion('');
+      setCode('');
+      setTestCases('');
+      setExpectedResult('');
+      alert('Question added to the magical tome!');
+    } else {
+      alert('Please fill in all fields');
+    }
+  };
 
   return (
     <div className="min-h-screen p-6 pt-2">
@@ -801,31 +806,29 @@ const HousePage = ({ setCurrentRoute }) => {
     { name: 'Slytherin', color: 'from-green-600 to-green-800', icon: '🐍', description: 'Ambition, cunning, leadership, and resourcefulness' }
   ];
 
-  const handleSubmit = () => {
-    if (rollNumber.trim() && selectedHouse) {
-      const existingIndex = houseAssignments.findIndex(assignment => assignment.rollNumber === rollNumber);
-      const newAssignment = {
-        id: Date.now(),
-        rollNumber: rollNumber,
-        house: selectedHouse
-      };
-      
-      if (existingIndex >= 0) {
-        const newAssignments = [...houseAssignments];
-        newAssignments[existingIndex] = newAssignment;
-        setHouseAssignments(newAssignments);
-        alert(`Student ${rollNumber} has been re-sorted into ${selectedHouse}!`);
-      } else {
-        setHouseAssignments([...houseAssignments, newAssignment]);
-        alert(`The Sorting Hat has spoken! Student ${rollNumber} belongs in ${selectedHouse}!`);
-      }
-      
-      setRollNumber('');
-      setSelectedHouse('');
-    } else {
-      alert('Please fill in all fields');
-    }
+const handleHouseSubmit = async (e) => {
+  e.preventDefault(); // stop page reload
+  if (!rollNumber.trim() || !selectedHouse) {
+    alert("Please fill in all fields");
+    return;
+  }
+
+  const payload = {
+    rollNumber: Number(rollNumber),
+    houseName: selectedHouse
   };
+
+  console.log("Sending PATCH /admin/house", payload);
+
+  try {
+    const res = await api.patch("/admin/house", payload);
+    console.log("Frontend got response:", res.status, res.data);
+    alert(`Assigned ${payload.rollNumber} to ${payload.houseName}`);
+  } catch (err) {
+    console.error("Error assigning house:", err);
+    alert("Failed to assign house");
+  }
+};
 
   return (
     <div className="min-h-screen p-6 pt-2">
@@ -883,9 +886,13 @@ const HousePage = ({ setCurrentRoute }) => {
               </div>
             </div>
 
-            <WizardButton onClick={handleSubmit} size="large" className="w-full">
-              Let the Sorting Hat Decide
-            </WizardButton>
+            <button
+  type="button"
+  onClick={handleHouseSubmit}
+  className="w-full bg-purple-700 text-white font-bold px-6 py-3 rounded-lg shadow-lg hover:bg-purple-800 transition"
+>
+  Let the Sorting Hat Decide
+</button>
           </div>
         </WizardCard>
 
