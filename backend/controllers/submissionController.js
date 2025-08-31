@@ -1,6 +1,6 @@
 const Submission = require("../models/Submission");
-const Question = require("../models/Question"); // optional: to validate question exists
-//const { runSubmission } = require("../utils/codeRunner");
+const Question = require("../models/Question");
+const Team = require("../models/Team");
 const axios = require("axios");
 require("dotenv").config();
 
@@ -13,20 +13,33 @@ const createSubmission = async (req, res) => {
       return res.status(400).json({ success: false, message: "questionId and code are required" });
     }
 
-    const question = await Question.findById(questionId).select("_id testCases");
+  const question = await Question.findById(questionId).select("_id testCases questionNumber");
     if (!question) {
       return res.status(404).json({ success: false, message: "Question not found" });
     }
 
-    const submission = new Submission({
-      questionId,
-      teamId,
-      language,
-      code,
-      status: "received"
-    });
-
-    await submission.save();
+    // Check for existing submission for this team and question
+    let submission = await Submission.findOne({ teamId, questionId });
+    if (submission) {
+      // Update existing submission
+      submission.language = language;
+      submission.code = code;
+      submission.status = "received";
+      submission.results = [];
+      submission.passedAll = false;
+      submission.error = null;
+      await submission.save();
+    } else {
+      // Create new submission
+      submission = new Submission({
+        questionId,
+        teamId,
+        language,
+        code,
+        status: "received"
+      });
+      await submission.save();
+    }
 
     // Prepare request body for remote compiler
     const requestBody = {
@@ -69,6 +82,18 @@ const createSubmission = async (req, res) => {
     }
 
   await submission.save();
+
+  // Update Team's testCasesPassed array
+  if (teamId && question.questionNumber) {
+    const team = await Team.findById(teamId);
+    if (team) {
+      // Ensure testCasesPassed array is size 7
+      while (team.testCasesPassed.length < 7) team.testCasesPassed.push(0);
+      const qnIdx = question.questionNumber - 1;
+      team.testCasesPassed[qnIdx] = Math.max(team.testCasesPassed[qnIdx], testcasesPassed);
+      await team.save();
+    }
+  }
 
   res.status(201).json({ success: true, submission, testcasesPassed, testcasesTotal: question.testCases.length });
   } catch (err) {
