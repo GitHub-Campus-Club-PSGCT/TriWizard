@@ -16,7 +16,7 @@ const GMapPage = () => {
   ];
 
   return (
-    <div className="map-page">
+    <div className="map-page gryffindor"> {/* ✅ Updated class name for Gryffindor */}
       <nav className="navbar">
         <div className="nav-logo">GRYFFINDOR</div> {/* ✅ Updated House Name */}
         <div className="nav-actions">

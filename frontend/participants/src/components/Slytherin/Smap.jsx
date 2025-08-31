@@ -16,7 +16,7 @@ const SMapPage = () => {
   ];
 
   return (
-    <div className="map-page">
+    <div className="map-page slytherin"> {/* ✅ Updated class name for Slytherin */}
       <nav className="navbar">
         <div className="nav-logo">SLYTHERIN</div> {/* ✅ Updated House Name */}
         <div className="nav-actions">

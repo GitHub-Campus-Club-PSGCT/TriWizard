@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Merriweather:wght@700&display=swap');
 
 /* --- Page Layout --- */
-.map-page {
+.gryffindor .map-page {
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -12,7 +12,7 @@
 }
 
 /* --- ✅ GRYFFINDOR Thematic Navbar --- */
-.navbar {
+.gryffindor .navbar {
   width: 100%;
   height: 70px;
   background: linear-gradient(to right, #2c0000, #000000); /* Scarlet to Black */
@@ -28,19 +28,19 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
-.nav-logo {
+.gryffindor .nav-logo {
   font-weight: 700;
   font-size: 1.8rem;
   letter-spacing: 3px;
   text-shadow: 0 0 8px rgba(238, 186, 48, 0.6);
 }
 
-.nav-actions {
+.gryffindor .nav-actions {
   display: flex;
   gap: 20px;
 }
 
-.nav-actions button {
+.gryffindor .nav-actions button {
   background: transparent;
   border: 2px solid rgba(238, 186, 48, 0.7);
   color: #eeba30;
@@ -55,7 +55,7 @@
   letter-spacing: 1px;
 }
 
-.nav-actions button:hover {
+.gryffindor .nav-actions button:hover {
   background: #ae0001; /* Gryffindor Scarlet */
   border-color: #eeba30;
   color: #eeba30;
@@ -65,7 +65,7 @@
 
 
 /* --- Map Container & Hotspots --- */
-.map-container {
+.gryffindor .map-container {
   flex-grow: 1;
   position: relative;
   width: 100%;
@@ -77,7 +77,7 @@
   box-sizing: border-box;
 }
 
-.map-image {
+.gryffindor .map-image {
   display: block;
   max-width: 100%;
   max-height: 100%;
@@ -86,15 +86,15 @@
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
 
-.map-hotspot {
+.gryffindor .map-hotspot {
   position: absolute;
   cursor: pointer;
   z-index: 10;
   transform: translate(-50%, -50%);
 }
 
-.map-hotspot::before,
-.map-hotspot::after {
+.gryffindor .map-hotspot::before,
+.gryffindor .map-hotspot::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -108,11 +108,11 @@
   pointer-events: none;
 }
 
-.map-hotspot:hover::before {
+.gryffindor .map-hotspot:hover::before {
   animation: rippleEffect 2s linear infinite;
 }
 
-.map-hotspot:hover::after {
+.gryffindor .map-hotspot:hover::after {
   animation: rippleEffect 2s linear infinite;
   animation-delay: 1s;
 }

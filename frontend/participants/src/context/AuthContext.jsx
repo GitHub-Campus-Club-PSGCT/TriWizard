@@ -4,24 +4,33 @@ import axios from "axios";
 const AuthContext = createContext();
 
 const api = axios.create({
-  baseURL: "http://localhost:8080",
-  withCredentials: true, // send/receive httpOnly cookies
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080",
+  withCredentials: true,
 });
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    () => localStorage.getItem("isLoggedIn") === "true"
+  );
 
   const fetchUser = useCallback(async () => {
     try {
       const res = await api.get("/api/auth/me");
       if (res.data?.success) {
         setUser(res.data.user);
+        setIsLoggedIn(true);
+        localStorage.setItem("isLoggedIn", "true");
       } else {
         setUser(null);
+        setIsLoggedIn(false);
+        localStorage.removeItem("isLoggedIn");
       }
     } catch {
       setUser(null);
+      setIsLoggedIn(false);
+      localStorage.removeItem("isLoggedIn");
     } finally {
       setLoading(false);
     }
@@ -35,13 +44,16 @@ export function AuthProvider({ children }) {
     try {
       const res = await api.post("/api/auth/otp-verify", { teamName, otp });
       if (res.data?.success) {
-        // Do NOT read or store JWT on FE. Cookie is already set by server.
-        await fetchUser(); // confirm session from server
-        return res.data;   // contains teamName/houseName for immediate UI if needed
+        await fetchUser();
+        setIsLoggedIn(true);
+        localStorage.setItem("isLoggedIn", "true");
+        return res.data;
       }
       return null;
     } catch (err) {
       console.error("Login failed", err);
+      setIsLoggedIn(false);
+      localStorage.removeItem("isLoggedIn");
       return null;
     }
   }
@@ -53,11 +65,13 @@ export function AuthProvider({ children }) {
       console.error("Logout failed", err);
     } finally {
       setUser(null);
+      setIsLoggedIn(false);
+      localStorage.removeItem("isLoggedIn");
     }
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, isLoggedIn }}>
       {children}
     </AuthContext.Provider>
   );
