@@ -24,7 +24,7 @@ const Rules = () => {
   };
 
   const handleNavigate = () => {
-    navigate("/your-route-here"); // 👉 replace with your route
+    navigate("/"); // 👉 replace with your route
   };
 
   return (
