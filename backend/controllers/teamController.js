@@ -46,6 +46,7 @@ const createTeam = async (req, res) => {
 //Update House by Roll Number
 const updateHouseByRollNumber = async (req, res) => {
   try {
+    console.log("Incoming body:", req.body);
     const { rollNumber, houseName } = req.body;
 
     if (!rollNumber || !houseName) {
