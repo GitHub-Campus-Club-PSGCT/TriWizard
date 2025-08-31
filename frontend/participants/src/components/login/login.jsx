@@ -6,7 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080",
   withCredentials: true,
 });
 
@@ -43,7 +43,7 @@ const SnitchDetailsModal = ({ onClose }) => (
 );
 
 export default function Login() {
-  const { login, isLoggedIn } = useAuth();
+  const { login, isLoggedIn, user } = useAuth(); 
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -55,13 +55,16 @@ export default function Login() {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   // ⭐ If already logged in, skip login flow
-  useEffect(() => {
-    if (isLoggedIn) {
+   useEffect(() => {
+    if (isLoggedIn && user) {
+      setAssignedHouse(user.houseName);
       setStep(STEPS.SUCCESS);
-      const t = setTimeout(() => navigate("/dashboard"), 1500);
-      return () => clearTimeout(t);
+      const timer = setTimeout(() => {
+        navigate(`/${user.houseName.toLowerCase()}/map`);
+      }, 1500);
+      return () => clearTimeout(timer);
     }
-  }, [isLoggedIn, navigate]);
+  }, [isLoggedIn, user, navigate]);
 
   const handleGetOtp = async (e) => {
     e.preventDefault();
@@ -90,22 +93,19 @@ export default function Login() {
     }
 
     const rollNumber = savedEmail.split("@")[0].toLowerCase();
-
+console.log("Attempting to verify with Roll Number:", rollNumber);
     try {
-      // 🔑 call backend verify
-      const res = await api.post("/login/otp-verify", {
-        rollNumber,
-        otp: enteredOtp,
-      });
+      const res = await login(rollNumber, enteredOtp);
+      console.log("Login response:", res.success);
+      //console.log("User data:", res.user.houseName);
 
-      if (res.data && res.data.houseName) {
-        // 🔥 also update AuthContext so it persists
-        await login(rollNumber, enteredOtp);
 
-        setAssignedHouse(res.data.houseName);
+      if (res?.success) {
+        setAssignedHouse(res.houseName);
         setStep(STEPS.SUCCESS);
       } else {
-        alert("OTP verified but no house assigned.");
+        // This case should ideally not be hit if login throws an error
+        alert("OTP verified but no user data returned.");
       }
     } catch (error) {
       alert(error?.response?.data?.message || "OTP verification failed");

@@ -35,7 +35,7 @@ const loginAdmin = async (req, res) => {
     }
 
     // successful login
-    const payload = { teamName: team.teamName, houseName: team.houseName };
+    const payload = { rollNumber: rollNumber.toLowerCase(), houseName: team.houseName };
     const token = signAuthToken(payload);
     setAuthCookie(res, token);
 
@@ -46,7 +46,7 @@ const loginAdmin = async (req, res) => {
     return res.json({
       success: true,
       message: "Login successful",
-      teamName: team.teamName,
+      rollNumber: rollNumber.toLowerCase(),
       houseName: team.houseName,
     });
   } catch (err) {
