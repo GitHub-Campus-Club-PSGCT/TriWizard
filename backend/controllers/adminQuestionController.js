@@ -4,9 +4,10 @@ const Question = require("../models/Question");
 // ================== CREATE QUESTION ==================
 const createQuestion = async (req, res) => {
   try {
-    const { houseName, questionNumber, buggedCode, testCases } = req.body;
+    console.log("Incoming body:", req.body);// Debug log
+    const { houseName, questionNumber,questionDescription,buggedCode, testCases } = req.body;
 
-    if (!houseName || !questionNumber || !buggedCode || !testCases) {
+    if (!houseName || !questionNumber || !buggedCode || !testCases|| !questionDescription) {
       return res.status(400).json({ success: false, message: "Missing fields" });
     }
 
@@ -17,8 +18,10 @@ const createQuestion = async (req, res) => {
     }
 
     // Create question
-    const newQuestion = new Question({ questionNumber, buggedCode, testCases });
+    const newQuestion = new Question({ questionNumber,questionDescription, buggedCode, testCases });
     await newQuestion.save();
+
+
 
     // Link to house
     house.questionIds.push(newQuestion._id);

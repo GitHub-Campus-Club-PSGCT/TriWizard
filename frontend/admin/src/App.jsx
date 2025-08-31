@@ -1,8 +1,7 @@
 import React, { useState, createContext, useContext } from 'react';
 import { ChevronLeft, Users, BookOpen, Home, Wand2, Star, Crown, Trophy, Plus, Minus, LogIn, LogOut, Send } from 'lucide-react';
-import api from './api'; // adjust path if needed
-import { createQuestion } from '../api/questionsApi';
-
+import api from './api'; // adjust path if needeed
+import { createQuestion } from './questionsApi'; // adjust path if needed
 
 // Context for global state management
 const AppContext = createContext();
@@ -704,30 +703,39 @@ const handleSubmit = async (e) => {
     return;
   }
 
-  const validTestCases = testCases.filter(tc => tc.input.trim() && tc.expectedOutput.trim());
+  const validTestCases = testCases.filter(tc => tc.input.trim() && tc.output.trim());
   if (validTestCases.length === 0) {
     alert('Please add at least one complete test case');
     return;
   }
 
   try {
-    const res = await createQuestion(houseName, parseInt(questionNumber), codeWithError.trim(), validTestCases);
+    const res = await createQuestion(
+      houseName,
+      parseInt(questionNumber),
+      questionDesc.trim(),
+      codeWithError.trim(),
+      validTestCases
+    );
+
+    console.log("Backend response:", res);
+
     if (res.data.success) {
       alert('Question saved successfully!');
-      // Reset form
       setQuestionNumber('');
       setQuestionDesc('');
       setCodeWithError('');
       setHouseName('');
-      setTestCases([{ input: '', expectedOutput: '' }]);
+      setTestCases([{ input: '', output: '' }]);
     } else {
-      alert(res.data.message);
+      alert(res.data.message||"Something went wrong");
     }
   } catch (err) {
-    console.error(err);
-    alert('Failed to save question');
+    console.error("Error from backend:", err.response?.data || err.message);
+    alert('Failed to save question: ' + (err.response?.data?.message || err.message));
   }
 };
+
 
   return (
     <div className="min-h-screen p-6 pt-2">
