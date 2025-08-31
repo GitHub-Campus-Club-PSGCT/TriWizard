@@ -697,19 +697,6 @@ const QuestionsPage = ({ setCurrentRoute }) => {
   const [testCases, setTestCases] = useState('');
   const [expectedResult, setExpectedResult] = useState('');
 
-  useEffect(() => {
-  const fetchQuestions = async () => {
-    try {
-      const res = await api.get("/adminQuestions"); // no houseName param needed
-      setQuestions(res.data);
-    } catch (err) {
-      console.error("Error fetching questions:", err);
-    }
-  };
-
-  fetchQuestions();
-}, []);
-
 
 const handleSubmit = async () => {
   if (!question.trim() || !code.trim() || !testCases.trim() || !expectedResult.trim()) {
@@ -725,8 +712,8 @@ const handleSubmit = async () => {
   };
 
   try {
-    const res = await api.post("/adminQuestions", newQuestion);
-    setQuestions([...questions, res.data]); // use backend _id
+    const res = await api.post("/admin-question", newQuestion);
+    setQuestions([...questions, res.data]); 
     setQuestion('');
     setCode('');
     setTestCases('');
