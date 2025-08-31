@@ -563,26 +563,36 @@ const TeamsPage = ({ setCurrentRoute }) => {
     setStudents(newStudents);
   };
 
-  const handleSubmit = () => {
-    if (teamName.trim() && students.every(s => s.name.trim() && s.rollNumber.trim())) {
-      const newTeam = {
-        id: Date.now(),
-        name: teamName,
-        students: students,
-        score: 0
-      };
-      setTeams([...teams, newTeam]);
-      setTeamName('');
-      setStudents([
-        { name: '', rollNumber: '' },
-        { name: '', rollNumber: '' },
-        { name: '', rollNumber: '' }
-      ]);
-      alert('Team created successfully!');
-    } else {
-      alert('Please fill in all fields');
+  const handleSubmit = async () => {
+  if (teamName.trim() && students.every(s => s.name.trim() && s.rollNumber.trim())) {
+    const newTeam = {
+      teamName: teamName,
+      members: students.map(s => ({
+        rollNumber: s.rollNumber,
+        name: s.name
+      }))
+    };
+
+    try {
+      const response = await api.post("/admin", newTeam);
+      setTeams([...teams, response.data]); 
+      alert("Team created successfully!");
+      setCurrentRoute("home");
+    } catch (error) {
+      console.error("Error creating team:", error);
+      alert("Failed to create team");
     }
-  };
+
+    setTeamName("");
+    setStudents([
+      { name: "", rollNumber: "" },
+      { name: "", rollNumber: "" },
+      { name: "", rollNumber: "" }
+    ]);
+  } else {
+    alert("Please fill in all fields");
+  }
+};
 
   return (
     <div className="min-h-screen p-6 pt-2">
