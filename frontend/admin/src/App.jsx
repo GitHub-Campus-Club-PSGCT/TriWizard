@@ -1,5 +1,6 @@
 import React, { useState, createContext, useContext } from 'react';
 import { ChevronLeft, Users, BookOpen, Home, Wand2, Star, Crown, Trophy, Plus, Minus, LogIn, LogOut, Send } from 'lucide-react';
+import api from './api'; // adjust path if needed
 
 // Context for global state management
 const AppContext = createContext();
@@ -359,37 +360,38 @@ const HomePage = ({ setCurrentRoute }) => {
   const [scoreValue, setScoreValue] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [rollNumber, setRollNumber] = useState('');
+  const [scoreChange, setScoreChange] = useState('');
   const handleScoreAdjustment = async () => {
-    if (!teamId.trim() || !scoreValue.trim()) {
-      alert('Please enter both Team ID and Score Value');
-      return;
-    }
+  if (!rollNumber.trim() || !scoreChange) {
+    alert("Please enter both roll number and score change");
+    return;
+  }
 
-    const scoreAdjustment = parseInt(scoreValue);
-    if (isNaN(scoreAdjustment)) {
-      alert('Score value must be a number');
-      return;
-    }
+  setIsSubmitting(true);
 
-    setIsSubmitting(true);
-    try {
-      await BackendService.adjustTeamScore(teamId, scoreAdjustment);
-      
-      setTeams(teams.map(team => 
-        team.id.toString() === teamId 
-          ? { ...team, score: Math.max(0, (team.score || 0) + scoreAdjustment) }
-          : team
-      ));
+  try {
+    const { data } = await api.post("/admin/score-change", {
+      rollNumber,
+      scoreChange: parseInt(scoreChange, 10)
+    });
 
-      setTeamId('');
-      setScoreValue('');
-      alert(`Score adjustment sent successfully! Added ${scoreAdjustment} points to Team ID: ${teamId}`);
-    } catch (error) {
-      alert(`Error: ${error.error || 'Failed to update score'}`);
-    } finally {
-      setIsSubmitting(false);
+    if (data.success) {
+      alert(data.message);
+      setRollNumber('');
+      setScoreChange('');
+    } else {
+      alert(data.message || "Something went wrong");
     }
-  };
+  } catch (error) {
+    console.error(error);
+    alert("Server error, please try again later");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+
 
   return (
     <div className="min-h-screen p-6">
@@ -480,75 +482,58 @@ const HomePage = ({ setCurrentRoute }) => {
             </div>
           </div>
         </div>
+        <div className="w-full max-w-4xl mb-8"></div>
+        {/* Score Management Card */}
+<div className="w-full max-w-4xl mb-8">
+  <WizardCard>
+    <h3 className="text-xl font-bold text-amber-900 mb-4 text-center">Score Management</h3>
+    <p className="text-amber-700 text-center mb-6">
+      Enter Roll Number and Score Value to adjust team scores via backend
+    </p>
 
-        <div className="w-full max-w-4xl mb-8">
-          <WizardCard>
-            <h3 className="text-xl font-bold text-amber-900 mb-4 text-center">Score Management</h3>
-            <p className="text-amber-700 text-center mb-6">Enter Team ID and Score Value to adjust team scores via backend</p>
-            
-            <div className="grid md:grid-cols-3 gap-4 items-end">
-              <WizardInput
-                label="Team ID"
-                value={teamId}
-                onChange={(e) => setTeamId(e.target.value)}
-                placeholder="Enter team ID..."
-                required
-              />
-              
-              <WizardInput
-                label="Score Value"
-                type="number"
-                value={scoreValue}
-                onChange={(e) => setScoreValue(e.target.value)}
-                placeholder="Enter score (+ or -)..."
-                required
-              />
-              
-              <WizardButton
-                variant="success"
-                onClick={handleScoreAdjustment}
-                disabled={isSubmitting}
-                className="h-12"
-              >
-                {isSubmitting ? (
-                  <span>Sending...</span>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    <span>Adjust Score</span>
-                  </>
-                )}
-              </WizardButton>
-            </div>
-            
-            <div className="mt-6 text-xs text-amber-600 bg-amber-50 p-3 rounded">
-              <strong>Note:</strong> This sends a POST request to the backend with Team ID and score adjustment value.
-              Positive values add points, negative values subtract points.
-            </div>
-          </WizardCard>
-        </div>
+    <div className="grid md:grid-cols-3 gap-4 items-end">
+      <WizardInput
+        label="Roll Number"
+        value={rollNumber}
+        onChange={(e) => setRollNumber(e.target.value)}
+        placeholder="Enter student roll number..."
+        required
+      />
 
-        {teams.length > 0 && (
-          <div className="w-full max-w-4xl">
-            <div className="bg-white/80 p-6 rounded-lg shadow-xl border-2 border-amber-400">
-              <h3 className="text-xl font-bold text-amber-900 mb-4 text-center">Registered Teams</h3>
-              <div className="space-y-3">
-                {teams.map((team) => (
-                  <div key={team.id} className="bg-amber-50 p-4 rounded-lg border border-amber-300 flex justify-between items-center">
-                    <div>
-                      <h4 className="font-bold text-amber-900">ID: {team.id} - {team.name}</h4>
-                      <div className="text-sm text-amber-700">Score: {team.score || 0}</div>
-                      <div className="text-xs text-amber-600">
-                        Members: {team.students.map(s => s.name).join(', ')}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+      <WizardInput
+        label="Score Change"
+        type="number"
+        value={scoreChange}
+        onChange={(e) => setScoreChange(e.target.value)}
+        placeholder="Enter score (+ or -)..."
+        required
+      />
+
+      <WizardButton
+        variant="success"
+        onClick={handleScoreAdjustment}
+        disabled={isSubmitting}
+        className="h-12"
+      >
+        {isSubmitting ? (
+          <span>Sending...</span>
+        ) : (
+          <>
+            <Send className="w-4 h-4" />
+            <span>Adjust Score</span>
+          </>
         )}
+      </WizardButton>
+    </div>
 
+    <div className="mt-6 text-xs text-amber-600 bg-amber-50 p-3 rounded">
+      <strong>Note:</strong> This sends a POST request to the backend with Roll Number and score adjustment value.
+      Positive values add points, negative values subtract points.
+    </div>
+  </WizardCard>
+</div>
+
+    </div>
         <div className="mt-12 text-center">
           <div className="flex justify-center space-x-4 mb-4">
             <div className="w-4 h-4 bg-red-600 rounded-full"></div>
@@ -559,7 +544,6 @@ const HomePage = ({ setCurrentRoute }) => {
           <p className="text-amber-700 text-sm italic">Welcome to Hogwarts School of Witchcraft and Wizardry</p>
         </div>
       </div>
-    </div>
   );
 };
 
@@ -942,15 +926,22 @@ const HousePage = ({ setCurrentRoute }) => {
     { name: 'Slytherin', color: 'from-green-600 to-green-800', icon: '🐍', description: 'Ambition, cunning, leadership, and resourcefulness' }
   ];
 
-  const handleSubmit = () => {
-    if (rollNumber.trim() && selectedHouse) {
-      const existingIndex = houseAssignments.findIndex(assignment => assignment.rollNumber === rollNumber);
-      const newAssignment = {
-        id: Date.now(),
-        rollNumber: rollNumber,
-        house: selectedHouse
-      };
-      
+const handleSubmit = async () => {
+  if (!rollNumber.trim() || !selectedHouse) {
+    alert('Please fill in all fields');
+    return;
+  }
+
+  try {
+    const { data } = await api.post('/admin/house', {
+      rollNumber,
+      houseName: selectedHouse
+    });
+
+    if (data.success) {
+      const existingIndex = houseAssignments.findIndex(a => a.rollNumber === rollNumber);
+      const newAssignment = { id: Date.now(), rollNumber, house: selectedHouse };
+
       if (existingIndex >= 0) {
         const newAssignments = [...houseAssignments];
         newAssignments[existingIndex] = newAssignment;
@@ -960,13 +951,17 @@ const HousePage = ({ setCurrentRoute }) => {
         setHouseAssignments([...houseAssignments, newAssignment]);
         alert(`The Sorting Hat has spoken! Student ${rollNumber} belongs in ${selectedHouse}!`);
       }
-      
+
       setRollNumber('');
       setSelectedHouse('');
     } else {
-      alert('Please fill in all fields');
+      alert(data.message || 'Something went wrong');
     }
-  };
+  } catch (error) {
+    console.error(error);
+    alert('Server error, please try again later.');
+  }
+};
 
   return (
     <div className="min-h-screen p-6 pt-2">

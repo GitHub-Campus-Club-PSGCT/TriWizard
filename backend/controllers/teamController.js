@@ -43,7 +43,7 @@ const createTeam = async (req, res) => {
   }
 };
 
-//Update House by Roll Number
+// Update House by Roll Number using POST
 const updateHouseByRollNumber = async (req, res) => {
   try {
     console.log("Incoming body:", req.body);
@@ -70,6 +70,9 @@ const updateHouseByRollNumber = async (req, res) => {
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
+
+module.exports = { updateHouseByRollNumber };
+
 
 // Get Teams by House Name
 const getTeamsByHouse = async (req, res) => {
@@ -99,5 +102,37 @@ const getTeamsByHouse = async (req, res) => {
   }
 };
 
+// Update team score by roll number
+const updateTeamScoreByRollNumber = async (req, res) => {
+  try {
+    console.log("Incoming body:", req.body);
+    const { rollNumber, scoreChange } = req.body;
+
+    if (!rollNumber || typeof scoreChange !== 'number') {
+      return res.status(400).json({ success: false, message: "Roll number and numeric scoreChange are required" });
+    }
+
+    // Find the team containing the roll number
+    const team = await Team.findOne({ "members.rollNumber": rollNumber });
+
+    if (!team) {
+      return res.status(404).json({ success: false, message: "Team not found for this roll number" });
+    }
+
+    // Add scoreChange to current team score
+    team.score = (team.score || 0) + scoreChange;
+    await team.save();
+
+    res.json({ 
+      success: true, 
+      message: `Team ${team.teamName} score updated by ${scoreChange}. New score: ${team.score}`, 
+      team 
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
 // 👇 Export ALL
-module.exports = { createTeam, updateHouseByRollNumber, getTeamsByHouse };
+module.exports = { createTeam, updateHouseByRollNumber, getTeamsByHouse, updateTeamScoreByRollNumber };
