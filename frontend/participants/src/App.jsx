@@ -29,7 +29,7 @@ function App() {
           <Route path="/ide/:housename/:questionNumber" element={<WizardIDE />} />
           <Route path="/ld" element={<Leaderboard />} />
           <Route path="/rules" element={<Rules />} />
-          <Route path="/dialogue" element={<DialoguePage house="Slytherin" nextRoute="/slytherin/map"/>
+          <Route path="/dialogue" element={<DialoguePage house="Hufflepuff" nextRoute="/slytherin/map"/>
 } />
           
         </Routes>

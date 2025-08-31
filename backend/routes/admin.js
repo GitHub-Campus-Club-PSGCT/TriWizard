@@ -9,4 +9,5 @@ router.post("/house", teamController.updateHouseByRollNumber);
 // Get Teams by House
 router.get("/house/:houseName", teamController.getTeamsByHouse);
 router.post("/score-change", teamController.updateTeamScoreByRollNumber);
+router.post("/teamid", teamController.getTeamIdByEmail);
 module.exports = router;
