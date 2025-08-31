@@ -6,13 +6,13 @@ import mapImage from '../../assets/Images/gryffindorMap.png'; // The new map ima
 const GMapPage = () => {
   // ✅ New coordinates and names for the Gryffindor locations
   const locations = [
-    { id: 1, top: '35%', left: '22%', width: '15%', height: '22%', name: 'Common Room Fireplace' },
-    { id: 2, top: '77%', left: '20%', width: '16%', height: '18%', name: 'Quidditch Pitch' },
-    { id: 3, top: '86%', left: '38%', width: '13%', height: '14%', name: 'Forbidden Forest Edge' },
-    { id: 4, top: '84%', left: '59%', width: '12%', height: '15%', name: 'The Owlery' },
-    { id: 5, top: '79%', left: '74%', width: '16%', height: '15%', name: 'Triwizard Maze' },
-    { id: 6, top: '35%', left: '74%', width: '14%', height: '20%', name: 'Tower Stairs' },
-    { id: 7, top: '47%', left: '50%', width: '18%', height: '25%', name: 'The Great Hall' },
+    { id: 1, top: '23%', left: '14%', width: '15%', height: '22%', name: 'Common Room Fireplace' },
+    { id: 2, top: '69%', left: '10%', width: '16%', height: '18%', name: 'Quidditch Pitch' },
+    { id: 3, top: '83%', left: '31%', width: '13%', height: '14%', name: 'Forbidden Forest Edge' },
+    { id: 4, top: '80%', left: '54%', width: '12%', height: '15%', name: 'The Owlery' },
+    { id: 5, top: '73%', left: '67%', width: '16%', height: '15%', name: 'Triwizard Maze' },
+    { id: 6, top: '23%', left: '69%', width: '14%', height: '20%', name: 'Tower Stairs' },
+    { id: 7, top: '36%', left: '42%', width: '18%', height: '25%', name: 'The Great Hall' },
   ];
 
   return (

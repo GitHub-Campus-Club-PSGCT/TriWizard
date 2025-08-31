@@ -11,26 +11,22 @@ const api = axios.create({
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    () => localStorage.getItem("isLoggedIn") === "true"
-  );
+  // No need to sync localStorage here, fetchUser is the source of truth
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
 
   const fetchUser = useCallback(async () => {
     try {
       const res = await api.get("/api/auth/me");
       if (res.data?.success) {
-        setUser(res.data.user);
+        setUser(res.data.user); // ✅ The user object is { rollNumber, houseName }
         setIsLoggedIn(true);
-        localStorage.setItem("isLoggedIn", "true");
       } else {
         setUser(null);
         setIsLoggedIn(false);
-        localStorage.removeItem("isLoggedIn");
       }
     } catch {
       setUser(null);
       setIsLoggedIn(false);
-      localStorage.removeItem("isLoggedIn");
     } finally {
       setLoading(false);
     }
@@ -40,21 +36,22 @@ export function AuthProvider({ children }) {
     fetchUser();
   }, [fetchUser]);
 
-  async function login(teamName, otp) {
+  // ✅ **FIX:** Streamlined login function. It now makes the API call.
+  async function login(rollNumber, otp) {
     try {
-      const res = await api.post("/api/auth/otp-verify", { teamName, otp });
+      const res = await api.post("/api/auth/otp-verify", { rollNumber, otp });
       if (res.data?.success) {
-        await fetchUser();
+        setUser(res.data.user); // Set user from the successful login response
         setIsLoggedIn(true);
-        localStorage.setItem("isLoggedIn", "true");
-        return res.data;
+        return res.data; // Return the full response to the component
       }
       return null;
     } catch (err) {
       console.error("Login failed", err);
+      setUser(null);
       setIsLoggedIn(false);
-      localStorage.removeItem("isLoggedIn");
-      return null;
+      // Re-throw or return error info so the component can handle it
+      throw err; 
     }
   }
 
@@ -66,7 +63,6 @@ export function AuthProvider({ children }) {
     } finally {
       setUser(null);
       setIsLoggedIn(false);
-      localStorage.removeItem("isLoggedIn");
     }
   }
 
