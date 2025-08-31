@@ -11,7 +11,7 @@ import Hmap from './components/Hufflepuff/Hmap';
 import Gmap from './components/Gryffindor/Gmap';
 import Smap from './components/Slytherin/Smap';
 import Rmap from './components/Ravenclaw/Rmap';
-
+import DialoguePage from './components/dialogue';
 
 import './App.css';
 
@@ -29,6 +29,9 @@ function App() {
           <Route path="/ide/:housename/:questionNumber" element={<WizardIDE />} />
           <Route path="/ld" element={<Leaderboard />} />
           <Route path="/rules" element={<Rules />} />
+          <Route path="/dialogue" element={<DialoguePage house="Slytherin" nextRoute="/slytherin/map"/>
+} />
+          
         </Routes>
       </AuthProvider>
     </Router>
