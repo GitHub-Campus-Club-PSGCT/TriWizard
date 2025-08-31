@@ -34,7 +34,7 @@ const GMapPage = () => {
         {locations.map(loc => (
           <Link
             key={loc.id}
-            to={`/gryffindor/debug/${loc.id}`}
+            to={`/ide/Gryffindor/${loc.id}`}
             className="map-hotspot"
             style={{
               top: loc.top,

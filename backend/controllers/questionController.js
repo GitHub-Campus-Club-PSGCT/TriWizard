@@ -28,6 +28,7 @@ const getQuestionByHouseAndNumber = async (req, res) => {
     return res.json({
       success: true,
       question: {
+        _id: question._id,
         questionNumber: question.questionNumber,
         buggedCode: question.buggedCode,
         testCases: question.testCases

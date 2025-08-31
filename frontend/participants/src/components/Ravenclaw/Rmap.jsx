@@ -34,7 +34,7 @@ const RMapPage = () => {
         {locations.map(loc => (
           <Link
             key={loc.id}
-            to={`/debug/${loc.id}`}
+            to={`/ide/Ravenclaw/${loc.id}`}
             className="map-hotspot"
             style={{
               top: loc.top,
