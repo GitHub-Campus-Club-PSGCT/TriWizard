@@ -697,25 +697,48 @@ const QuestionsPage = ({ setCurrentRoute }) => {
   const [testCases, setTestCases] = useState('');
   const [expectedResult, setExpectedResult] = useState('');
 
-  const handleSubmit = () => {
-    if (question.trim() && code.trim() && testCases.trim() && expectedResult.trim()) {
-      const newQuestion = {
-        id: Date.now(),
-        question: question,
-        code: code,
-        testCases: testCases,
-        expectedResult: expectedResult
-      };
-      setQuestions([...questions, newQuestion]);
-      setQuestion('');
-      setCode('');
-      setTestCases('');
-      setExpectedResult('');
-      alert('Question added to the magical tome!');
-    } else {
-      alert('Please fill in all fields');
+  useEffect(() => {
+  const fetchQuestions = async () => {
+    try {
+      const res = await api.get("/adminQuestions"); // no houseName param needed
+      setQuestions(res.data);
+    } catch (err) {
+      console.error("Error fetching questions:", err);
     }
   };
+
+  fetchQuestions();
+}, []);
+
+
+const handleSubmit = async () => {
+  if (!question.trim() || !code.trim() || !testCases.trim() || !expectedResult.trim()) {
+    alert('Please fill in all fields');
+    return;
+  }
+
+  const newQuestion = {
+    question,
+    code,
+    testCases,
+    expectedResult
+  };
+
+  try {
+    const res = await api.post("/adminQuestions", newQuestion);
+    setQuestions([...questions, res.data]); // use backend _id
+    setQuestion('');
+    setCode('');
+    setTestCases('');
+    setExpectedResult('');
+    alert('Question added to the magical tome!');
+  } catch (err) {
+    console.error("Error adding question:", err);
+    alert('Failed to add question, check console for details.');
+  }
+};
+
+
 
   return (
     <div className="min-h-screen p-6 pt-2">
