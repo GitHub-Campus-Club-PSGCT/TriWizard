@@ -3,17 +3,19 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default function WizardIDE() {
   const { housename, questionNumber } = useParams(); 
-   
-
   const [theme, setTheme] = useState(""); 
   const [code, setCode] = useState("// Loading question...");
   const [output, setOutput] = useState("Result will appear here...");
   const [testCases, setTestCases] = useState([]);
   const [questionId, setQuestionId] = useState(null); // ✅ store questionId
   const [teamId, setTeamId] = useState(null);
+  const [testCasesPassed, setTestCasesPassed] = useState(0);
+  const [testCasesTotal, setTestCasesTotal] = useState(0);
+  const [submissionResults, setSubmissionResults] = useState([]);
 
   // 🔹 Number-to-theme mapping
   const themeMap = {
@@ -28,7 +30,7 @@ export default function WizardIDE() {
       if (!email) return;
 
       try {
-        const res = await fetch("http://localhost:8080/admin/teamid", {
+        const res = await fetch(`${API_URL}/admin/teamid`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email }),
@@ -52,7 +54,7 @@ export default function WizardIDE() {
     const fetchBuggyCode = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8080/questions/${themeMap[housename] || housename}/${questionNumber}`
+          `${API_URL}/questions/${themeMap[housename] || housename}/${questionNumber}`
         );
         const data = await res.json();
 
@@ -84,7 +86,7 @@ export default function WizardIDE() {
     }
 
     try {
-      const res = await fetch("http://localhost:8080/submission", {
+      const res = await fetch(`${API_URL}/submission`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -96,8 +98,13 @@ export default function WizardIDE() {
       });
 
       const data = await res.json();
+      console.log(data);
 
       if (data.success) {
+        setTestCasesPassed(data.testcasesPassed || 0);
+        setTestCasesTotal(data.testcasesTotal || 0);
+        setSubmissionResults(data.submission.results || []);
+        
         const resultsText = data.submission.results
           .map(
             (r, i) =>
@@ -122,34 +129,53 @@ export default function WizardIDE() {
         </h2>
       </div>
 
-      <Editor
-        height="400px"
-        defaultLanguage="c"
-        theme="vs-dark"
-        value={code}
-        onChange={(value) => setCode(value || "")}
-        options={{ fontSize: 14, minimap: { enabled: false }, automaticLayout: true }}
-      />
+      <div className="monaco-editor-container">
+        <Editor
+          height="400px"
+          defaultLanguage="c"
+          theme="vs-dark"
+          value={code}
+          onChange={(value) => setCode(value || "")}
+          options={{ fontSize: 14, minimap: { enabled: false }, automaticLayout: true }}
+        />
+      </div>
 
-      <button className="run-btn" onClick={runCode}>
-        ▶ Run
-      </button>
+      <div className="content-container">
+        <button className="run-btn" onClick={runCode}>
+          ▶ Run
+        </button>
 
-      {testCases.length > 0 && (
-        <div className="testcase-box">
-          <h3>Test Cases</h3>
-          {testCases.map((tc, i) => (
-            <div key={i} className="testcase">
-              <p><b>Input:</b> {tc.input}</p>
-              <p><b>Expected Output:</b> {tc.expectedOutput}</p>
-            </div>
-          ))}
+        {/* Test Cases Passed Summary */}
+        {testCasesTotal > 0 && (
+          <div className="testcase-summary">
+            <h3>Test Cases: {testCasesPassed}/{testCasesTotal} Passed</h3>
+          </div>
+        )}
+
+        {testCases.length > 0 && (
+          <div className="testcase-box">
+            <h3>Test Cases</h3>
+            {testCases.map((tc, i) => (
+              <div key={i} className="testcase">
+                <p><b>Input:</b> {tc.input}</p>
+                <p><b>Expected Output:</b> {tc.expectedOutput}</p>
+                {submissionResults[i] && (
+                  <p><b>Actual Output:</b> {submissionResults[i].actualOutput}</p>
+                )}
+                {submissionResults[i] && (
+                  <p><b>Status:</b> <span className={submissionResults[i].passed ? 'passed' : 'failed'}>
+                    {submissionResults[i].passed ? '✅ Passed' : '❌ Failed'}
+                  </span></p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        
+        <div className="output">
+          <h3>Your Output</h3>
+          <pre>{output}</pre>
         </div>
-      )}
-      
-      <div className="output">
-        <h3>Your Output</h3>
-        <pre>{output}</pre>
       </div>
     </div>
   );
