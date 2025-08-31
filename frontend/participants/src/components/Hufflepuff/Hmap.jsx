@@ -6,13 +6,13 @@ import mapImage from '../../assets/Images/hufflepuffMap.png';
 
 const MapPage = () => {
   const locations = [
-    { id: 1, top: '26%', left: '22%', width: '9%', height: '14%', name: 'Hufflepuff Basement' },
-    { id: 2, top: '60%', left: '20%', width: '13%', height: '12%', name: 'Herbology Greenhouse' },
-    { id: 3, top: '80%', left: '34%', width: '12%', height: '12%', name: 'Kitchen by the Barrel' },
-    { id: 4, top: '83%', left: '58%', width: '9%', height: '8%', name: 'Magical Creatures Pen' },
-    { id: 5, top: '79%', left: '73%', width: '12%', height: '12%', name: 'Leaky Cauldron' },
-    { id: 6, top: '30%', left: '75%', width: '11%', height: '10%', name: "Badger's Tunnel" },
-    { id: 7, top: '44%', left: '49%', width: '15%', height: '20%', name: 'The Great Hall' },
+    { id: 1, top: '18%', left: '16%', width: '9%', height: '14%', name: 'Hufflepuff Basement' },
+    { id: 2, top: '56%', left: '13%', width: '13%', height: '12%', name: 'Herbology Greenhouse' },
+    { id: 3, top: '75%', left: '27%', width: '12%', height: '12%', name: 'Kitchen by the Barrel' },
+    { id: 4, top: '80%', left: '54%', width: '9%', height: '8%', name: 'Magical Creatures Pen' },
+    { id: 5, top: '75%', left: '70%', width: '12%', height: '12%', name: 'Leaky Cauldron' },
+    { id: 6, top: '24%', left: '72%', width: '11%', height: '10%', name: "Badger's Tunnel" },
+    { id: 7, top: '39%', left: '43%', width: '15%', height: '20%', name: 'The Great Hall' },
   ];
 
   return (
