@@ -40,6 +40,7 @@ app.use("/questions", require("./routes/questions"));
 app.use("/submission", require("./routes/submission"));
 app.use("/", require("./routes/codeRunner"));
 app.use("/", require("./routes"));
+app.use("/admin-questions", require("./routes/adminQuestions"));
 
 // Save code
 app.post("/submit", async (req,res)=>{

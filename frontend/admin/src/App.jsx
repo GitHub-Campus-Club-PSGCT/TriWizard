@@ -1,6 +1,8 @@
 import React, { useState, createContext, useContext } from 'react';
 import { ChevronLeft, Users, BookOpen, Home, Wand2, Star, Crown, Trophy, Plus, Minus, LogIn, LogOut, Send } from 'lucide-react';
 import api from './api'; // adjust path if needed
+import { createQuestion } from '../api/questionsApi';
+
 
 // Context for global state management
 const AppContext = createContext();
@@ -693,49 +695,39 @@ const QuestionsPage = ({ setCurrentRoute }) => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Validate all required fields
-    if (!questionNumber.trim() || !questionDesc.trim() || !codeWithError.trim() || !houseName) {
-      alert('Please fill in all required fields');
-      return;
+ 
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!questionNumber.trim() || !questionDesc.trim() || !codeWithError.trim() || !houseName) {
+    alert('Please fill all required fields');
+    return;
+  }
+
+  const validTestCases = testCases.filter(tc => tc.input.trim() && tc.expectedOutput.trim());
+  if (validTestCases.length === 0) {
+    alert('Please add at least one complete test case');
+    return;
+  }
+
+  try {
+    const res = await createQuestion(houseName, parseInt(questionNumber), codeWithError.trim(), validTestCases);
+    if (res.data.success) {
+      alert('Question saved successfully!');
+      // Reset form
+      setQuestionNumber('');
+      setQuestionDesc('');
+      setCodeWithError('');
+      setHouseName('');
+      setTestCases([{ input: '', expectedOutput: '' }]);
+    } else {
+      alert(res.data.message);
     }
-
-    // Validate test cases
-    const validTestCases = testCases.filter(tc => tc.input.trim() && tc.output.trim());
-    if (validTestCases.length === 0) {
-      alert('Please add at least one complete test case');
-      return;
-    }
-
-    const formData = {
-      questionNumber: parseInt(questionNumber),
-      questionDesc: questionDesc.trim(),
-      codeWithError: codeWithError.trim(),
-      houseName: houseName,
-      testCases: validTestCases
-    };
-
-    // Log complete form data to console
-    console.log('Complete form data:', formData);
-
-    const newQuestion = {
-      id: Date.now(),
-      ...formData
-    };
-    
-    setQuestions([...questions, newQuestion]);
-    
-    // Reset form
-    setQuestionNumber('');
-    setQuestionDesc('');
-    setCodeWithError('');
-    setHouseName('');
-    setTestCases([{ input: '', output: '' }]);
-    
-    alert('Question added to the magical tome!');
-  };
+  } catch (err) {
+    console.error(err);
+    alert('Failed to save question');
+  }
+};
 
   return (
     <div className="min-h-screen p-6 pt-2">

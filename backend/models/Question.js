@@ -7,6 +7,10 @@ const questionSchema = new mongoose.Schema({
     min: 1,
     max: 7
   },
+  questionDescription: {
+    type: String,
+    required: true
+  },
   buggedCode: {
     type: String,
     required: true
