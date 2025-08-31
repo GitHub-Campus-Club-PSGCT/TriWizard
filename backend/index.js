@@ -80,7 +80,6 @@ mongoose
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-<<<<<<< HEAD
 const Question = require("./models/Question");
 mongoose.connect("mongodb+srv://subhasubbiah7:FYuFc4fEtFCv2AYd@cluster0.pqss5ak.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
   useNewUrlParser: true,
@@ -92,9 +91,7 @@ mongoose.connect("mongodb+srv://subhasubbiah7:FYuFc4fEtFCv2AYd@cluster0.pqss5ak.
 const codeRunnerRoutes = require("./routes/codeRunner");
 app.use("/", codeRunnerRoutes);
 
-=======
 // Health check
->>>>>>> 5738c78c039fed39ddc35e987e8ce2e427cfa132
 app.get("/", (req, res) => {
   res.send("Hello from server 🚀");
 });

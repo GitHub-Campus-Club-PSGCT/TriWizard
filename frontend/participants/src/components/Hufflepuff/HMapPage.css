@@ -1,5 +1,5 @@
 /* --- Page Layout --- */
-.map-page {
+.hufflepuff .map-page {
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -9,10 +9,10 @@
 }
 
 /* --- Navbar (Hufflepuff Harry Potter Style) --- */
-.navbar {
+.hufflepuff .navbar {
   width: 100%;
   height: 70px;
-  background: linear-gradient(to right, #000000, #1a1a1a);
+  background: linear-gradient(to right, #5a581b, #000000);
   border-bottom: 3px solid gold;
   display: flex;
   justify-content: space-between;
@@ -30,19 +30,19 @@
 }
 
 /* Left logo (house name) */
-.nav-logo {
+.hufflepuff .nav-logo {
   font-weight: bold;
   letter-spacing: 3px;
   text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
 }
 
 /* Right buttons */
-.nav-actions {
+.hufflepuff .nav-actions {
   display: flex;
   gap: 15px;
 }
 
-.nav-actions button {
+.hufflepuff .nav-actions button {
   background: rgba(255, 215, 0, 0.1);
   border: 2px solid gold;
   color: gold;
@@ -54,14 +54,14 @@
   transition: all 0.3s ease;
 }
 
-.nav-actions button:hover {
+.hufflepuff .nav-actions button:hover {
   background: gold;
   color: black;
   box-shadow: 0 0 10px gold;
 }
 
 /* --- Map Container --- */
-.map-container {
+.hufflepuff .map-container {
   position: relative;
   width: 100vw;
   height: calc(100vh - 70px); /* start below navbar */
@@ -72,7 +72,7 @@
   align-items: center;
 }
 
-.map-image {
+.hufflepuff .map-image {
   display: block;
   max-width: 100%;
   max-height: 100%;
@@ -80,14 +80,14 @@
 }
 
 /* --- Hotspots --- */
-.map-hotspot {
+.hufflepuff .map-hotspot {
   position: absolute;
   cursor: pointer;
   z-index: 10;
 }
 
-.map-hotspot::before,
-.map-hotspot::after {
+.hufflepuff .map-hotspot::before,
+.hufflepuff .map-hotspot::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -101,11 +101,11 @@
   pointer-events: none;
 }
 
-.map-hotspot:hover::before {
+.hufflepuff .map-hotspot:hover::before {
   animation: rippleEffect 2s linear infinite;
 }
 
-.map-hotspot:hover::after {
+.hufflepuff .map-hotspot:hover::after {
   animation: rippleEffect 2s linear infinite;
   animation-delay: 1s;
 }

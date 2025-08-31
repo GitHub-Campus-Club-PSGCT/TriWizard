@@ -16,7 +16,7 @@ const RMapPage = () => {
   ];
 
   return (
-    <div className="map-page">
+    <div className="map-page ravenclaw"> {/* ✅ Updated class name for Ravenclaw */}
       <nav className="navbar">
         <div className="nav-logo">RAVENCLAW</div> {/* ✅ Updated House Name */}
         <div className="nav-actions">
