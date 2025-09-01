@@ -6,13 +6,13 @@ import mapImage from '../../assets/Images/slytherinMap.png'; // The new map imag
 const SMapPage = () => {
   // ✅ New coordinates and names for the Slytherin locations
   const locations = [
-    { id: 1, top: '21%', left: '22%', width: '15%', height: '20%', name: 'Slytherin Dungeon' },
-    { id: 2, top: '53%', left: '24%', width: '13%', height: '14%', name: 'Potions Classroom' },
-    { id: 3, top: '78%', left: '28%', width: '20%', height: '15%', name: 'Black Lake Shore' },
-    { id: 4, top: '80%', left: '60%', width: '12%', height: '12%', name: 'Room of Hidden Secrets' },
-    { id: 5, top: '72%', left: '76%', width: '16%', height: '18%', name: 'The Chamber\'s Entrance' },
-    { id: 6, top: '32%', left: '75%', width: '14%', height: '18%', name: 'Malfoy Manor' },
-    { id: 7, top: '47%', left: '50%', width: '18%', height: '25%', name: 'The Great Hall' },
+    { id: 1, top: '10%', left: '13%', width: '15%', height: '20%', name: 'Slytherin Dungeon' },
+    { id: 2, top: '45%', left: '16%', width: '13%', height: '14%', name: 'Potions Classroom' },
+    { id: 3, top: '72%', left: '17%', width: '20%', height: '15%', name: 'Black Lake Shore' },
+    { id: 4, top: '76%', left: '54%', width: '12%', height: '12%', name: 'Room of Hidden Secrets' },
+    { id: 5, top: '64%', left: '69%', width: '16%', height: '18%', name: 'The Chamber\'s Entrance' },
+    { id: 6, top: '22%', left: '69%', width: '14%', height: '18%', name: 'Malfoy Manor' },
+    { id: 7, top: '37%', left: '40%', width: '18%', height: '25%', name: 'The Great Hall' },
   ];
 
   return (
