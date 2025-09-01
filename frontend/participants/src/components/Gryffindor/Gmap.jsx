@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './GMapPage.css'; // Using the new Gryffindor CSS file
 import mapImage from '../../assets/Images/gryffindorMap.png'; // The new map image
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const GMapPage = () => {
   // ✅ New coordinates and names for the Gryffindor locations

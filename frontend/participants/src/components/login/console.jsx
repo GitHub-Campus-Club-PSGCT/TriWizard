@@ -1,4 +1,5 @@
 import "../../components-css/WizardIDE.css";
+import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Editor from "@monaco-editor/react";
@@ -16,7 +17,7 @@ export default function WizardIDE() {
   const [testCasesPassed, setTestCasesPassed] = useState(0);
   const [testCasesTotal, setTestCasesTotal] = useState(0);
   const [submissionResults, setSubmissionResults] = useState([]);
-
+  const navigate = useNavigate();
   // 🔹 Number-to-theme mapping
   const themeMap = {
     "1": "Gryffindor",
@@ -105,6 +106,10 @@ export default function WizardIDE() {
         setTestCasesTotal(data.testcasesTotal || 0);
         setSubmissionResults(data.submission.results || []);
         
+      if (data.submission.passedAll) {
+        navigate(`/dialogue/${theme}`); // theme is Gryffindor/Hufflepuff/etc.
+      }
+
         const resultsText = data.submission.results
           .map(
             (r, i) =>
@@ -125,8 +130,14 @@ export default function WizardIDE() {
     <div className={`wizard-ide ${theme}`}>
       <div className="topbar">
         <h2>
-          Wizard IDE 🪄 – {theme} | Question {questionNumber}
+          Wizard IDE  – {theme} | Question {questionNumber}
         </h2>
+        <button 
+          className="back-btn" 
+          onClick={() => navigate(`/${theme.toLowerCase()}/map`)}  // ✅ navigate back to map
+        >
+          ⬅ Back
+          </button>
       </div>
 
       <div className="monaco-editor-container">

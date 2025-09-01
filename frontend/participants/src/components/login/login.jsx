@@ -209,7 +209,7 @@ console.log("Attempting to verify with Roll Number:", rollNumber);
               className="btn success-btn"
               onClick={() =>navigate(`/${assignedHouse.toLowerCase()}/map`)}
             >
-              Enter the Great Hall
+              Enter the Trial
             </button>
           </div>
         )}

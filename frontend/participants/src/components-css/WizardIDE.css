@@ -9,13 +9,12 @@
 
 .topbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* spread title & button */
   align-items: center;
-  padding: 12px 16px;
-  border-bottom: 2px solid var(--border);
-  background: var(--panel);
-  color: var(--text);
-  flex-shrink: 0;
+  padding: 10px 20px;
+  background: #1e1e1e;
+  color: white;
+  border-bottom: 2px solid #444;
 }
 
 /* Monaco Editor Container */
@@ -75,7 +74,17 @@
   font-weight: bold;
   flex-shrink: 0;
 }
-
+.back-btn {
+  background: #6a6866;
+  color: white;
+  border: none;
+  font-weight: bold;
+  padding: 6px 14px;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
 .testcase-box {
   background: var(--panel);
   color: var(--text);
