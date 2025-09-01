@@ -16,14 +16,14 @@ const RMapPage = () => {
   ];
 
   return (
-    <div className="map-page">
+    <div className="map-page ravenclaw"> {/* ✅ Updated class name for Ravenclaw */}
       <nav className="navbar">
         <div className="nav-logo">RAVENCLAW</div> {/* ✅ Updated House Name */}
         <div className="nav-actions">
           <Link to="/rules">
             <button>Rules</button>
           </Link>
-          <Link to="/leaderboard">
+          <Link to="/ld">
             <button>Leaderboard</button>
           </Link>
         </div>
@@ -34,7 +34,7 @@ const RMapPage = () => {
         {locations.map(loc => (
           <Link
             key={loc.id}
-            to={`/debug/${loc.id}`}
+            to={`/ide/Ravenclaw/${loc.id}`}
             className="map-hotspot"
             style={{
               top: loc.top,

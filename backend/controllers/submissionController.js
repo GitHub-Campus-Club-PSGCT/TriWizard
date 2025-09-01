@@ -54,7 +54,8 @@ const createSubmission = async (req, res) => {
   let testcasesPassed = 0;
 
     try {
-      const response = await axios.post(COMPILER_URL, requestBody, { timeout: 10000 });
+      const response = await axios.post(`${COMPILER_URL}/submit`, requestBody, { timeout: 10000 });
+      console.log(response.data); //for debugging purpose
       if (response.data.results) {
         results = response.data.results.map(tc => ({
           input: tc.input,

@@ -11,7 +11,7 @@ router.post("/otp-verify", loginAdmin);
 router.get("/me", authMiddleware, (req, res) => {
   res.json({
     success: true,
-    user: { teamName: req.teamName, houseName: req.houseName },
+     user: {houseName: req.houseName },
   });
 });
 

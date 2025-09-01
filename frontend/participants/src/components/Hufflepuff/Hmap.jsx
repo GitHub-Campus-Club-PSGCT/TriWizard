@@ -16,7 +16,7 @@ const MapPage = () => {
   ];
 
   return (
-    <div className="map-page">
+    <div className="map-page hufflepuff">
       {/* ✅ Navbar */}
       <nav className="navbar">
         <div className="nav-logo">HUFFLEPUFF</div>
@@ -24,7 +24,7 @@ const MapPage = () => {
           <Link to="/rules">
             <button>Rules</button>
           </Link>
-          <Link to="/leaderboard">
+          <Link to="/ld">
             <button>Leaderboard</button>
           </Link>
         </div>
@@ -36,7 +36,7 @@ const MapPage = () => {
         {locations.map(loc => (
           <Link
             key={loc.id}
-            to={`/hufflepuff/debug/${loc.id}`}
+            to={`/ide/Hufflepuff/${loc.id}`}
             className="map-hotspot"
             style={{
               top: loc.top,

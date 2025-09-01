@@ -16,14 +16,14 @@ const SMapPage = () => {
   ];
 
   return (
-    <div className="map-page">
+    <div className="map-page slytherin"> {/* ✅ Updated class name for Slytherin */}
       <nav className="navbar">
         <div className="nav-logo">SLYTHERIN</div> {/* ✅ Updated House Name */}
         <div className="nav-actions">
           <Link to="/rules">
             <button>Rules</button>
           </Link>
-          <Link to="/leaderboard">
+          <Link to="/ld">
             <button>Leaderboard</button>
           </Link>
         </div>
@@ -34,7 +34,7 @@ const SMapPage = () => {
         {locations.map(loc => (
           <Link
             key={loc.id}
-            to={`/debug/${loc.id}`}
+            to={`/ide/Slytherin/${loc.id}`}
             className="map-hotspot"
             style={{
               top: loc.top,

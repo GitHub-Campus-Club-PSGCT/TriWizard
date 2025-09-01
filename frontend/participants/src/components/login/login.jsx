@@ -3,9 +3,10 @@ import "../../components-css/login.css";
 import axios from "axios";
 import mapBackground from "../../assets/Images/LoginBG.png";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080",
   withCredentials: true,
 });
 
@@ -42,10 +43,10 @@ const SnitchDetailsModal = ({ onClose }) => (
 );
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, isLoggedIn, user } = useAuth(); 
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
-  //const [teamName, setTeamName] = useState("");
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const [step, setStep] = useState(STEPS.EMAIL);
   const [loading, setLoading] = useState(false);
@@ -53,23 +54,23 @@ export default function Login() {
   const otpInputRefs = useRef([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  useEffect(() => {
-    if (step === STEPS.SUCCESS) {
-      const t = setTimeout(() => {
-        // navigate to dashboard here
-        // e.g., navigate("/dashboard");
+  // ⭐ If already logged in, skip login flow
+   useEffect(() => {
+    if (isLoggedIn && user) {
+      setAssignedHouse(user.houseName);
+      setStep(STEPS.SUCCESS);
+      const timer = setTimeout(() => {
+        navigate(`/${user.houseName.toLowerCase()}/map`);
       }, 1500);
-      return () => clearTimeout(t);
+      return () => clearTimeout(timer);
     }
-  }, [step]);
+  }, [isLoggedIn, user, navigate]);
 
   const handleGetOtp = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // ⭐ Save email locally so OTP step can retrieve it later
       localStorage.setItem("email", email);
-
       await api.post("/login/otp-gen", { email });
       setStep(STEPS.OTP);
     } catch (error) {
@@ -80,43 +81,39 @@ export default function Login() {
   };
 
   const handleVerifyOtp = async (e) => {
-  e.preventDefault();
-  const enteredOtp = otp.join("");
-  if (enteredOtp.length < 6) return;
+    e.preventDefault();
+    const enteredOtp = otp.join("");
+    if (enteredOtp.length < 6) return;
 
-  // ⭐ Retrieve stored email and derive rollNumber (case-insensitive)
-  const savedEmail = localStorage.getItem("email");
-  if (!savedEmail) {
-    alert("Email not found. Please go back and enter your email again.");
-    setStep(STEPS.EMAIL);
-    return;
-  }
-
-  // 👉 Extract roll number from email before "@"
-  const rollNumber = savedEmail.split("@")[0].toLowerCase(); // ensure case-insensitive
-
-  try {
-    const res = await api.post("/login/otp-verify", {
-      rollNumber,
-      otp: enteredOtp,
-    });
-
-    if (res.data && res.data.houseName) {
-      alert("OTP verified successfully!");
-      setAssignedHouse(res.data.houseName);
-      setStep(STEPS.SUCCESS);
-    } else {
-      alert("OTP verified but no house assigned.");
+    const savedEmail = localStorage.getItem("email");
+    if (!savedEmail) {
+      alert("Email not found. Please go back and enter your email again.");
+      setStep(STEPS.EMAIL);
+      return;
     }
-    // proceed to next step, e.g., dashboard
-  } catch (error) {
-    alert(error?.response?.data?.message || "OTP verification failed");
-  }
-};
 
+    const rollNumber = savedEmail.split("@")[0].toLowerCase();
+console.log("Attempting to verify with Roll Number:", rollNumber);
+    try {
+      const res = await login(rollNumber, enteredOtp);
+      console.log("Login response:", res.success);
+      //console.log("User data:", res.user.houseName);
+
+
+      if (res?.success) {
+        setAssignedHouse(res.houseName);
+        setStep(STEPS.SUCCESS);
+      } else {
+        // This case should ideally not be hit if login throws an error
+        alert("OTP verified but no user data returned.");
+      }
+    } catch (error) {
+      alert(error?.response?.data?.message || "OTP verification failed");
+    }
+  };
 
   const handleOtpChange = (element, index) => {
-    const val = element.value.replace(/\D/g, ""); // numeric only
+    const val = element.value.replace(/\D/g, "");
     if (!val && otp[index] && index > 0 && !element.value) {
       otpInputRefs.current[index - 1]?.focus();
     }
@@ -174,7 +171,6 @@ export default function Login() {
             <h1 className="title">The Final Incantation</h1>
             <p className="subtitle">Whisper the six secret runes.</p>
             <form onSubmit={handleVerifyOtp} className="magical-form">
-
               <div className="otp-container">
                 {otp.map((data, index) => (
                   <input
@@ -211,7 +207,7 @@ export default function Login() {
             </p>
             <button
               className="btn success-btn"
-              onClick={() => alert("Navigating to the Great Hall dashboard!")}
+              onClick={() =>navigate(`/${assignedHouse.toLowerCase()}/map`)}
             >
               Enter the Great Hall
             </button>

@@ -1,6 +1,8 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, createContext, useContext } from 'react';
 import { ChevronLeft, Users, BookOpen, Home, Wand2, Star, Crown, Trophy, Plus, Minus, LogIn, LogOut, Send } from 'lucide-react';
-import api from "./api";
+import api from './api'; // adjust path if needeed
+import { createQuestion } from './questionsApi'; // adjust path if needed
+
 // Context for global state management
 const AppContext = createContext();
 
@@ -8,32 +10,24 @@ const AppProvider = ({ children }) => {
   const [teams, setTeams] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [houseAssignments, setHouseAssignments] = useState([]);
-  
-  // Load once from localStorage (or default to false)
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const saved = localStorage.getItem("isAuthenticated");
-    return saved ? JSON.parse(saved) : false;
-  });
-
-  // Save to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("isAuthenticated", JSON.stringify(isAuthenticated));
-  }, [isAuthenticated]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   return (
-    <AppContext.Provider
-      value={{ teams, setTeams, questions, setQuestions, houseAssignments, setHouseAssignments, isAuthenticated, setIsAuthenticated }}
-    >
+    <AppContext.Provider value={{
+      teams, setTeams,
+      questions, setQuestions,
+      houseAssignments, setHouseAssignments,
+      isAuthenticated, setIsAuthenticated
+    }}>
       {children}
     </AppContext.Provider>
   );
 };
 
-
 const useAppContext = () => useContext(AppContext);
 
 // Reusable UI Components
-const WizardButton = ({ children, onClick, variant = 'primary', size = 'medium', disabled = false, className = '' }) => {
+const WizardButton = ({ children, onClick, variant = 'primary', size = 'medium', disabled = false, className = '', type = 'button' }) => {
   const baseClasses = 'font-bold rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-2';
   
   const variants = {
@@ -52,6 +46,7 @@ const WizardButton = ({ children, onClick, variant = 'primary', size = 'medium',
 
   return (
     <button
+      type={type}
       onClick={onClick}
       disabled={disabled}
       className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
@@ -304,15 +299,14 @@ const LoginPage = ({ setCurrentRoute }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
- const handleLogin = () => {
-  if (username === 'ghccadmin' && password === 'ghcc@25') {
-    setIsAuthenticated(true);
-    setCurrentRoute('home');
-  } else {
-    alert('Invalid username or password!');
-  }
-};
-
+  const handleLogin = () => {
+    if (username === 'ghccadmin' && password === 'ghcc@25') {
+      setIsAuthenticated(true);
+      setCurrentRoute('home');
+    } else {
+      alert('Invalid username or password!');
+    }
+  };
 
   return (
     <ParchmentBackground>
@@ -367,37 +361,38 @@ const HomePage = ({ setCurrentRoute }) => {
   const [scoreValue, setScoreValue] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [rollNumber, setRollNumber] = useState('');
+  const [scoreChange, setScoreChange] = useState('');
   const handleScoreAdjustment = async () => {
-    if (!teamId.trim() || !scoreValue.trim()) {
-      alert('Please enter both Team ID and Score Value');
-      return;
-    }
+  if (!rollNumber.trim() || !scoreChange) {
+    alert("Please enter both roll number and score change");
+    return;
+  }
 
-    const scoreAdjustment = parseInt(scoreValue);
-    if (isNaN(scoreAdjustment)) {
-      alert('Score value must be a number');
-      return;
-    }
+  setIsSubmitting(true);
 
-    setIsSubmitting(true);
-    try {
-      await BackendService.adjustTeamScore(teamId, scoreAdjustment);
-      
-      setTeams(teams.map(team => 
-        team.id.toString() === teamId 
-          ? { ...team, score: Math.max(0, (team.score || 0) + scoreAdjustment) }
-          : team
-      ));
+  try {
+    const { data } = await api.post("/admin/score-change", {
+      rollNumber,
+      scoreChange: parseInt(scoreChange, 10)
+    });
 
-      setTeamId('');
-      setScoreValue('');
-      alert(`Score adjustment sent successfully! Added ${scoreAdjustment} points to Team ID: ${teamId}`);
-    } catch (error) {
-      alert(`Error: ${error.error || 'Failed to update score'}`);
-    } finally {
-      setIsSubmitting(false);
+    if (data.success) {
+      alert(data.message);
+      setRollNumber('');
+      setScoreChange('');
+    } else {
+      alert(data.message || "Something went wrong");
     }
-  };
+  } catch (error) {
+    console.error(error);
+    alert("Server error, please try again later");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+
 
   return (
     <div className="min-h-screen p-6">
@@ -488,75 +483,58 @@ const HomePage = ({ setCurrentRoute }) => {
             </div>
           </div>
         </div>
+        <div className="w-full max-w-4xl mb-8"></div>
+        {/* Score Management Card */}
+<div className="w-full max-w-4xl mb-8">
+  <WizardCard>
+    <h3 className="text-xl font-bold text-amber-900 mb-4 text-center">Score Management</h3>
+    <p className="text-amber-700 text-center mb-6">
+      Enter Roll Number and Score Value to adjust team scores via backend
+    </p>
 
-        <div className="w-full max-w-4xl mb-8">
-          <WizardCard>
-            <h3 className="text-xl font-bold text-amber-900 mb-4 text-center">Score Management</h3>
-            <p className="text-amber-700 text-center mb-6">Enter Team ID and Score Value to adjust team scores via backend</p>
-            
-            <div className="grid md:grid-cols-3 gap-4 items-end">
-              <WizardInput
-                label="Team ID"
-                value={teamId}
-                onChange={(e) => setTeamId(e.target.value)}
-                placeholder="Enter team ID..."
-                required
-              />
-              
-              <WizardInput
-                label="Score Value"
-                type="number"
-                value={scoreValue}
-                onChange={(e) => setScoreValue(e.target.value)}
-                placeholder="Enter score (+ or -)..."
-                required
-              />
-              
-              <WizardButton
-                variant="success"
-                onClick={handleScoreAdjustment}
-                disabled={isSubmitting}
-                className="h-12"
-              >
-                {isSubmitting ? (
-                  <span>Sending...</span>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    <span>Adjust Score</span>
-                  </>
-                )}
-              </WizardButton>
-            </div>
-            
-            <div className="mt-6 text-xs text-amber-600 bg-amber-50 p-3 rounded">
-              <strong>Note:</strong> This sends a POST request to the backend with Team ID and score adjustment value.
-              Positive values add points, negative values subtract points.
-            </div>
-          </WizardCard>
-        </div>
+    <div className="grid md:grid-cols-3 gap-4 items-end">
+      <WizardInput
+        label="Roll Number"
+        value={rollNumber}
+        onChange={(e) => setRollNumber(e.target.value)}
+        placeholder="Enter student roll number..."
+        required
+      />
 
-        {teams.length > 0 && (
-          <div className="w-full max-w-4xl">
-            <div className="bg-white/80 p-6 rounded-lg shadow-xl border-2 border-amber-400">
-              <h3 className="text-xl font-bold text-amber-900 mb-4 text-center">Registered Teams</h3>
-              <div className="space-y-3">
-                {teams.map((team) => (
-                  <div key={team.id} className="bg-amber-50 p-4 rounded-lg border border-amber-300 flex justify-between items-center">
-                    <div>
-                      <h4 className="font-bold text-amber-900">ID: {team.id} - {team.name}</h4>
-                      <div className="text-sm text-amber-700">Score: {team.score || 0}</div>
-                      <div className="text-xs text-amber-600">
-                        Members: {team.students.map(s => s.name).join(', ')}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+      <WizardInput
+        label="Score Change"
+        type="number"
+        value={scoreChange}
+        onChange={(e) => setScoreChange(e.target.value)}
+        placeholder="Enter score (+ or -)..."
+        required
+      />
+
+      <WizardButton
+        variant="success"
+        onClick={handleScoreAdjustment}
+        disabled={isSubmitting}
+        className="h-12"
+      >
+        {isSubmitting ? (
+          <span>Sending...</span>
+        ) : (
+          <>
+            <Send className="w-4 h-4" />
+            <span>Adjust Score</span>
+          </>
         )}
+      </WizardButton>
+    </div>
 
+    <div className="mt-6 text-xs text-amber-600 bg-amber-50 p-3 rounded">
+      <strong>Note:</strong> This sends a POST request to the backend with Roll Number and score adjustment value.
+      Positive values add points, negative values subtract points.
+    </div>
+  </WizardCard>
+</div>
+
+    </div>
         <div className="mt-12 text-center">
           <div className="flex justify-center space-x-4 mb-4">
             <div className="w-4 h-4 bg-red-600 rounded-full"></div>
@@ -567,7 +545,6 @@ const HomePage = ({ setCurrentRoute }) => {
           <p className="text-amber-700 text-sm italic">Welcome to Hogwarts School of Witchcraft and Wizardry</p>
         </div>
       </div>
-    </div>
   );
 };
 
@@ -692,52 +669,72 @@ const TeamsPage = ({ setCurrentRoute }) => {
 // Questions Page
 const QuestionsPage = ({ setCurrentRoute }) => {
   const { questions, setQuestions } = useAppContext();
-  const [question, setQuestion] = useState('');
-  const [code, setCode] = useState('');
-  const [testCases, setTestCases] = useState('');
-  const [expectedResult, setExpectedResult] = useState('');
+  const [questionNumber, setQuestionNumber] = useState('');
+  const [questionDesc, setQuestionDesc] = useState('');
+  const [codeWithError, setCodeWithError] = useState('');
+  const [houseName, setHouseName] = useState('');
+  const [testCases, setTestCases] = useState([{ input: '', output: '' }]);
 
-  useEffect(() => {
-  const fetchQuestions = async () => {
-    try {
-      const res = await api.get("/adminQuestions"); // no houseName param needed
-      setQuestions(res.data);
-    } catch (err) {
-      console.error("Error fetching questions:", err);
+  const houses = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin'];
+
+  const handleTestCaseChange = (index, field, value) => {
+    const newTestCases = [...testCases];
+    newTestCases[index][field] = value;
+    setTestCases(newTestCases);
+  };
+
+  const addTestCase = () => {
+    setTestCases([...testCases, { input: '', output: '' }]);
+  };
+
+  const removeTestCase = (index) => {
+    if (testCases.length > 1) {
+      const newTestCases = testCases.filter((_, i) => i !== index);
+      setTestCases(newTestCases);
     }
   };
 
-  fetchQuestions();
-}, []);
+ 
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-
-const handleSubmit = async () => {
-  if (!question.trim() || !code.trim() || !testCases.trim() || !expectedResult.trim()) {
-    alert('Please fill in all fields');
+  if (!questionNumber.trim() || !questionDesc.trim() || !codeWithError.trim() || !houseName) {
+    alert('Please fill all required fields');
     return;
   }
 
-  const newQuestion = {
-    question,
-    code,
-    testCases,
-    expectedResult
-  };
+  const validTestCases = testCases.filter(tc => tc.input.trim() && tc.output.trim());
+  if (validTestCases.length === 0) {
+    alert('Please add at least one complete test case');
+    return;
+  }
 
   try {
-    const res = await api.post("/adminQuestions", newQuestion);
-    setQuestions([...questions, res.data]); // use backend _id
-    setQuestion('');
-    setCode('');
-    setTestCases('');
-    setExpectedResult('');
-    alert('Question added to the magical tome!');
+    const res = await createQuestion(
+      houseName,
+      parseInt(questionNumber),
+      questionDesc.trim(),
+      codeWithError.trim(),
+      validTestCases
+    );
+
+    console.log("Backend response:", res);
+
+    if (res.data.success) {
+      alert('Question saved successfully!');
+      setQuestionNumber('');
+      setQuestionDesc('');
+      setCodeWithError('');
+      setHouseName('');
+      setTestCases([{ input: '', output: '' }]);
+    } else {
+      alert(res.data.message||"Something went wrong");
+    }
   } catch (err) {
-    console.error("Error adding question:", err);
-    alert('Failed to add question, check console for details.');
+    console.error("Error from backend:", err.response?.data || err.message);
+    alert('Failed to save question: ' + (err.response?.data?.message || err.message));
   }
 };
-
 
 
   return (
@@ -750,11 +747,20 @@ const handleSubmit = async () => {
             <p className="text-blue-700">Add your wisdom to the enchanted spellbook of knowledge</p>
           </div>
 
-          <div className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <WizardInput
+              label="Question Number"
+              type="number"
+              value={questionNumber}
+              onChange={(e) => setQuestionNumber(e.target.value)}
+              placeholder="Enter question number..."
+              required
+            />
+
             <WizardTextArea
               label="Question Description"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
+              value={questionDesc}
+              onChange={(e) => setQuestionDesc(e.target.value)}
               placeholder="Enter your magical question here..."
               rows={3}
               required
@@ -762,36 +768,91 @@ const handleSubmit = async () => {
 
             <WizardTextArea
               label="Code (with deliberate error)"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
+              value={codeWithError}
+              onChange={(e) => setCodeWithError(e.target.value)}
               placeholder="Enter code with a deliberate error for students to fix..."
-              rows={6}
+              rows={8}
               required
               className="font-mono"
             />
 
-            <WizardTextArea
-              label="Test Cases"
-              value={testCases}
-              onChange={(e) => setTestCases(e.target.value)}
-              placeholder="Enter test cases to validate the code..."
-              rows={3}
-              required
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-1">
+                House Assignment <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={houseName}
+                onChange={(e) => setHouseName(e.target.value)}
+                required
+                className="w-full px-4 py-3 rounded-lg border-2 border-amber-400 focus:border-amber-600 focus:outline-none bg-white text-gray-900"
+              >
+                <option value="">Select a Hogwarts House...</option>
+                {houses.map((house) => (
+                  <option key={house} value={house}>{house}</option>
+                ))}
+              </select>
+            </div>
 
-            <WizardTextArea
-              label="Expected Result"
-              value={expectedResult}
-              onChange={(e) => setExpectedResult(e.target.value)}
-              placeholder="Enter the expected result after fixing the code..."
-              rows={2}
-              required
-            />
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-blue-900">Test Cases</h3>
+                <WizardButton
+                  type="button"
+                  variant="success"
+                  size="small"
+                  onClick={addTestCase}
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Test Case</span>
+                </WizardButton>
+              </div>
+              
+              <div className="space-y-4">
+                {testCases.map((testCase, index) => (
+                  <div key={index} className="p-4 bg-white/50 rounded-lg border-2 border-blue-300">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-medium text-blue-900">Test Case {index + 1}</h4>
+                      {testCases.length > 1 && (
+                        <WizardButton
+                          type="button"
+                          variant="danger"
+                          size="small"
+                          onClick={() => removeTestCase(index)}
+                        >
+                          <Minus className="w-4 h-4" />
+                          <span>Remove</span>
+                        </WizardButton>
+                      )}
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <WizardTextArea
+                        label="Test Input"
+                        value={testCase.input}
+                        onChange={(e) => handleTestCaseChange(index, 'input', e.target.value)}
+                        placeholder="Enter test input..."
+                        rows={3}
+                        required
+                      />
+                      
+                      <WizardTextArea
+                        label="Expected Output"
+                        value={testCase.output}
+                        onChange={(e) => handleTestCaseChange(index, 'output', e.target.value)}
+                        placeholder="Enter expected output..."
+                        rows={3}
+                        required
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-            <WizardButton variant="secondary" onClick={handleSubmit} size="large" className="w-full">
+            <WizardButton variant="secondary" type="submit" size="large" className="w-full">
               Add to Spellbook
             </WizardButton>
-          </div>
+          </form>
         </WizardCard>
 
         {questions.length > 0 && (
@@ -800,11 +861,57 @@ const handleSubmit = async () => {
             <div className="space-y-4">
               {questions.map((q, index) => (
                 <div key={q.id} className="bg-blue-50 p-4 rounded-lg border border-blue-300">
-                  <h4 className="font-bold text-blue-900 mb-2">Question {index + 1}: {q.question}</h4>
-                  <div className="text-xs text-blue-700 space-y-1">
-                    <div><strong>Code:</strong> {q.code.substring(0, 100)}...</div>
-                    <div><strong>Test Cases:</strong> {q.testCases}</div>
-                    <div><strong>Expected Result:</strong> {q.expectedResult}</div>
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h4 className="font-bold text-blue-900 mb-1">
+                        Question {q.questionNumber || index + 1}: {q.questionDesc || q.question}
+                      </h4>
+                      {q.houseName && (
+                        <span className={`inline-block px-2 py-1 text-xs rounded-full font-semibold mb-2 ${
+                          q.houseName === 'Gryffindor' ? 'bg-red-200 text-red-800' :
+                          q.houseName === 'Hufflepuff' ? 'bg-yellow-200 text-yellow-800' :
+                          q.houseName === 'Ravenclaw' ? 'bg-blue-200 text-blue-800' :
+                          q.houseName === 'Slytherin' ? 'bg-green-200 text-green-800' :
+                          'bg-gray-200 text-gray-800'
+                        }`}>
+                          {q.houseName}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="text-xs text-blue-700 space-y-2">
+                    <div>
+                      <strong>Code:</strong> 
+                      <pre className="bg-gray-100 p-2 rounded mt-1 text-xs overflow-x-auto">
+                        {(q.codeWithError || q.code || '').substring(0, 200)}...
+                      </pre>
+                    </div>
+                    
+                    {q.testCases && Array.isArray(q.testCases) ? (
+                      <div>
+                        <strong>Test Cases ({q.testCases.length}):</strong>
+                        <div className="mt-1 space-y-1">
+                          {q.testCases.slice(0, 2).map((tc, tcIndex) => (
+                            <div key={tcIndex} className="bg-gray-100 p-2 rounded text-xs">
+                              <div><strong>Input:</strong> {tc.input}</div>
+                              <div><strong>Output:</strong> {tc.output}</div>
+                            </div>
+                          ))}
+                          {q.testCases.length > 2 && (
+                            <div className="text-xs text-blue-600 italic">
+                              +{q.testCases.length - 2} more test cases...
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      // Legacy format fallback
+                      <>
+                        {q.testCases && <div><strong>Test Cases:</strong> {q.testCases}</div>}
+                        {q.expectedResult && <div><strong>Expected Result:</strong> {q.expectedResult}</div>}
+                      </>
+                    )}
                   </div>
                 </div>
               ))}
@@ -829,27 +936,40 @@ const HousePage = ({ setCurrentRoute }) => {
     { name: 'Slytherin', color: 'from-green-600 to-green-800', icon: '🐍', description: 'Ambition, cunning, leadership, and resourcefulness' }
   ];
 
-const handleHouseSubmit = async (e) => {
-  e.preventDefault(); // stop page reload
+const handleSubmit = async () => {
   if (!rollNumber.trim() || !selectedHouse) {
-    alert("Please fill in all fields");
+    alert('Please fill in all fields');
     return;
   }
 
-  const payload = {
-    rollNumber: Number(rollNumber),
-    houseName: selectedHouse
-  };
-
-  console.log("Sending PATCH /admin/house", payload);
-
   try {
-    const res = await api.patch("/admin/house", payload);
-    console.log("Frontend got response:", res.status, res.data);
-    alert(`Assigned ${payload.rollNumber} to ${payload.houseName}`);
-  } catch (err) {
-    console.error("Error assigning house:", err);
-    alert("Failed to assign house");
+    const { data } = await api.post('/admin/house', {
+      rollNumber,
+      houseName: selectedHouse
+    });
+
+    if (data.success) {
+      const existingIndex = houseAssignments.findIndex(a => a.rollNumber === rollNumber);
+      const newAssignment = { id: Date.now(), rollNumber, house: selectedHouse };
+
+      if (existingIndex >= 0) {
+        const newAssignments = [...houseAssignments];
+        newAssignments[existingIndex] = newAssignment;
+        setHouseAssignments(newAssignments);
+        alert(`Student ${rollNumber} has been re-sorted into ${selectedHouse}!`);
+      } else {
+        setHouseAssignments([...houseAssignments, newAssignment]);
+        alert(`The Sorting Hat has spoken! Student ${rollNumber} belongs in ${selectedHouse}!`);
+      }
+
+      setRollNumber('');
+      setSelectedHouse('');
+    } else {
+      alert(data.message || 'Something went wrong');
+    }
+  } catch (error) {
+    console.error(error);
+    alert('Server error, please try again later.');
   }
 };
 
@@ -909,13 +1029,9 @@ const handleHouseSubmit = async (e) => {
               </div>
             </div>
 
-            <button
-  type="button"
-  onClick={handleHouseSubmit}
-  className="w-full bg-purple-700 text-white font-bold px-6 py-3 rounded-lg shadow-lg hover:bg-purple-800 transition"
->
-  Let the Sorting Hat Decide
-</button>
+            <WizardButton onClick={handleSubmit} size="large" className="w-full">
+              Let the Sorting Hat Decide
+            </WizardButton>
           </div>
         </WizardCard>
 

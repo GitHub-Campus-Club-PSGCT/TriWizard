@@ -1,106 +1,97 @@
-/* --- Google Font Import --- */
-@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Merriweather:wght@700&display=swap');
-
 /* --- Page Layout --- */
-.map-page {
+.ravenclaw .map-page {
   width: 100vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #1a1a1a;
+  background: #060709;
   overflow: hidden;
 }
 
-/* --- ✅ RAVENCLAW Thematic Navbar --- */
-.navbar {
+/* --- Navbar (Ravenclaw Style) --- */
+.ravenclaw .navbar {
   width: 100%;
   height: 70px;
-  background: linear-gradient(to right, #0e1a40, #000000); /* Dark Blue to Black */
-  border-bottom: 4px solid #946b2d; /* Ravenclaw Bronze */
+  background: linear-gradient(to right, #0e1a40, #000000);
+  border-bottom: 3px solid #946b2d;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 40px;
+  padding: 0 30px;
   box-sizing: border-box;
   color: #946b2d;
   font-family: 'Cinzel Decorative', serif;
+  font-size: 1.5rem;
+  position: fixed;
+  top: 0;
+  left: 0;
   z-index: 100;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.6);
 }
 
-.nav-logo {
-  font-weight: 700;
-  font-size: 1.8rem;
+.ravenclaw .nav-logo {
+  font-weight: bold;
   letter-spacing: 3px;
-  text-shadow: 0 0 8px rgba(148, 107, 45, 0.6);
+  text-shadow: 0 0 8px rgba(148, 107, 45, 0.7);
 }
 
-.nav-actions {
+.ravenclaw .nav-actions {
   display: flex;
-  gap: 20px;
+  gap: 15px;
 }
 
-.nav-actions button {
-  background: transparent;
-  border: 2px solid rgba(148, 107, 45, 0.7);
+.ravenclaw .nav-actions button {
+  background: rgba(148, 107, 45, 0.1);
+  border: 2px solid #946b2d;
   color: #946b2d;
-  font-family: 'Merriweather', serif;
-  font-size: 0.9rem;
-  font-weight: 700;
-  padding: 10px 20px;
-  border-radius: 3px;
+  font-size: 1rem;
+  font-family: 'Georgia', serif;
+  padding: 8px 16px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
-.nav-actions button:hover {
-  background: #222f5b; /* Ravenclaw Blue */
-  border-color: #c59e57;
-  color: #c59e57;
-  box-shadow: 0 0 15px rgba(197, 158, 87, 0.7);
-  transform: translateY(-2px);
+.ravenclaw .nav-actions button:hover {
+  background: #946b2d;
+  color: #0e1a40;
+  box-shadow: 0 0 10px #946b2d;
 }
 
-
-/* --- Map Container & Hotspots --- */
-.map-container {
-  flex-grow: 1;
+/* --- Map Container --- */
+.ravenclaw .map-container {
   position: relative;
-  width: 100%;
-  background: #1a1a1a;
+  width: 100vw;
+  height: calc(100vh - 70px);
+  margin-top: 70px;
+  background: #000000;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
-  box-sizing: border-box;
 }
 
-.map-image {
+.ravenclaw .map-image {
   display: block;
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  border-radius: 8px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
 
-.map-hotspot {
+/* --- Hotspots --- */
+.ravenclaw .map-hotspot {
   position: absolute;
   cursor: pointer;
   z-index: 10;
-  transform: translate(-50%, -50%);
 }
 
-.map-hotspot::before,
-.map-hotspot::after {
+.ravenclaw .map-hotspot::before,
+.ravenclaw .map-hotspot::after {
   content: '';
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border: 2px solid rgba(34, 47, 91, 0.9); /* ✅ Ravenclaw Blue Ripple */
+  border: 2px solid rgba(31, 28, 103, 0.8);
   border-radius: 50%;
   width: 100%;
   height: 100%;
@@ -108,11 +99,11 @@
   pointer-events: none;
 }
 
-.map-hotspot:hover::before {
+.ravenclaw .map-hotspot:hover::before {
   animation: rippleEffect 2s linear infinite;
 }
 
-.map-hotspot:hover::after {
+.ravenclaw .map-hotspot:hover::after {
   animation: rippleEffect 2s linear infinite;
   animation-delay: 1s;
 }
@@ -121,11 +112,11 @@
   0% {
     width: 100%;
     height: 100%;
-    opacity: 0.9;
+    opacity: 0.8;
   }
   100% {
-    width: 200%;
-    height: 200%;
+    width: 300%;
+    height: 300%;
     opacity: 0;
   }
 }

@@ -11,7 +11,7 @@ const authMiddleware = (req, res, next) => {
 
     // Attach verified claims to request
     req.user = decoded;
-    req.teamName = decoded.teamName;
+    req.rollNumber = decoded.rollNumber;
     req.houseName = decoded.houseName;
 
     next();

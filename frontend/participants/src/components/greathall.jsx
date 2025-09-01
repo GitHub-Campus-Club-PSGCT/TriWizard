@@ -24,7 +24,7 @@ const Rules = () => {
   };
 
   const handleNavigate = () => {
-    navigate("/"); // 👉 replace with your route
+    navigate(-1); // 👉 replace with your route
   };
 
   return (
@@ -45,6 +45,7 @@ const Rules = () => {
         )}
 
         {step === dialogueParts.length && (
+
           <button className="next-btn" onClick={handleNavigate}>
             Next →
           </button>

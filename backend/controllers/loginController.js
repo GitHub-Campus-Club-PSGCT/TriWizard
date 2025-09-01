@@ -8,8 +8,8 @@ const signAuthToken = (payload) =>
 const setAuthCookie = (res, token) => {
   res.cookie("authToken", token, {
     httpOnly: true,
-    secure: false,                // stays false for localhost dev
-    sameSite: "None",             // ❌ was Lax → not sent cross-site
+    secure: false,                
+    sameSite: "None",             
     maxAge: 5 * 60 * 60 * 1000,
   });
 };
@@ -35,7 +35,7 @@ const loginAdmin = async (req, res) => {
     }
 
     // successful login
-    const payload = { teamName: team.teamName, houseName: team.houseName };
+    const payload = { rollNumber: rollNumber.toLowerCase(), houseName: team.houseName };
     const token = signAuthToken(payload);
     setAuthCookie(res, token);
 
@@ -46,7 +46,7 @@ const loginAdmin = async (req, res) => {
     return res.json({
       success: true,
       message: "Login successful",
-      teamName: team.teamName,
+      rollNumber: rollNumber.toLowerCase(),
       houseName: team.houseName,
     });
   } catch (err) {

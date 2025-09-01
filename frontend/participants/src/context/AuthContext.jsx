@@ -4,24 +4,29 @@ import axios from "axios";
 const AuthContext = createContext();
 
 const api = axios.create({
-  baseURL: "http://localhost:8080",
-  withCredentials: true, // send/receive httpOnly cookies
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080",
+  withCredentials: true,
 });
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  // No need to sync localStorage here, fetchUser is the source of truth
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
 
   const fetchUser = useCallback(async () => {
     try {
       const res = await api.get("/api/auth/me");
       if (res.data?.success) {
-        setUser(res.data.user);
+        setUser(res.data.user); // ✅ The user object is { rollNumber, houseName }
+        setIsLoggedIn(true);
       } else {
         setUser(null);
+        setIsLoggedIn(false);
       }
     } catch {
       setUser(null);
+      setIsLoggedIn(false);
     } finally {
       setLoading(false);
     }
@@ -31,18 +36,22 @@ export function AuthProvider({ children }) {
     fetchUser();
   }, [fetchUser]);
 
-  async function login(teamName, otp) {
+  // ✅ **FIX:** Streamlined login function. It now makes the API call.
+  async function login(rollNumber, otp) {
     try {
-      const res = await api.post("/api/auth/otp-verify", { teamName, otp });
+      const res = await api.post("/api/auth/otp-verify", { rollNumber, otp });
       if (res.data?.success) {
-        // Do NOT read or store JWT on FE. Cookie is already set by server.
-        await fetchUser(); // confirm session from server
-        return res.data;   // contains teamName/houseName for immediate UI if needed
+        setUser(res.data.user); // Set user from the successful login response
+        setIsLoggedIn(true);
+        return res.data; // Return the full response to the component
       }
       return null;
     } catch (err) {
       console.error("Login failed", err);
-      return null;
+      setUser(null);
+      setIsLoggedIn(false);
+      // Re-throw or return error info so the component can handle it
+      throw err; 
     }
   }
 
@@ -53,11 +62,12 @@ export function AuthProvider({ children }) {
       console.error("Logout failed", err);
     } finally {
       setUser(null);
+      setIsLoggedIn(false);
     }
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, isLoggedIn }}>
       {children}
     </AuthContext.Provider>
   );
