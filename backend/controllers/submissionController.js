@@ -2,6 +2,7 @@ const Submission = require("../models/Submission");
 const Question = require("../models/Question");
 const Team = require("../models/Team");
 const axios = require("axios");
+const broadcastLeaderboard = require("../index").broadcastLeaderboard;
 require("dotenv").config();
 
 const COMPILER_URL = process.env.COMPILER_URL;
@@ -13,7 +14,7 @@ const createSubmission = async (req, res) => {
       return res.status(400).json({ success: false, message: "questionId and code are required" });
     }
 
-  const question = await Question.findById(questionId).select("_id testCases questionNumber");
+    const question = await Question.findById(questionId).select("_id testCases questionNumber");
     if (!question) {
       return res.status(404).json({ success: false, message: "Question not found" });
     }
@@ -48,10 +49,10 @@ const createSubmission = async (req, res) => {
       submissionid: submission._id.toString()
     };
 
-  let results = [];
-  let passedAll = true;
-  let error = null;
-  let testcasesPassed = 0;
+    let results = [];
+    let passedAll = true;
+    let error = null;
+    let testcasesPassed = 0;
 
     try {
       const response = await axios.post(`${COMPILER_URL}/submit`, requestBody, { timeout: 10000 });
@@ -82,21 +83,26 @@ const createSubmission = async (req, res) => {
       submission.passedAll = false;
     }
 
-  await submission.save();
+    await submission.save();
 
-  // Update Team's testCasesPassed array
-  if (teamId && question.questionNumber) {
-    const team = await Team.findById(teamId);
-    if (team) {
-      // Ensure testCasesPassed array is size 7
-      while (team.testCasesPassed.length < 7) team.testCasesPassed.push(0);
-      const qnIdx = question.questionNumber - 1;
-      team.testCasesPassed[qnIdx] = Math.max(team.testCasesPassed[qnIdx], testcasesPassed);
-      await team.save();
+    const points_per_testcase = 10;
+    // Update Team's testCasesPassed array
+    if (teamId && question.questionNumber) {
+      const team = await Team.findById(teamId);
+      if (team) {
+        // Ensure testCasesPassed array is size 7
+        while (team.testCasesPassed.length < 7) team.testCasesPassed.push(0);
+        const qnIdx = question.questionNumber - 1;
+        const old_testcases_passed = team.testCasesPassed[qnIdx];
+        team.testCasesPassed[qnIdx] = Math.max(team.testCasesPassed[qnIdx], testcasesPassed);
+        team.score = team.score + (Math.max((testcasesPassed - old_testcases_passed), 0) * points_per_testcase);
+        await team.save();
+
+        broadcastLeaderboard();
+      }
     }
-  }
 
-  res.status(201).json({ success: true, submission, testcasesPassed, testcasesTotal: question.testCases.length });
+    res.status(201).json({ success: true, submission, testcasesPassed, testcasesTotal: question.testCases.length });
   } catch (err) {
     console.error("createSubmission error:", err);
     res.status(500).json({ success: false, message: "Server error" });
