@@ -19,14 +19,14 @@ const houseCharacters = {
     gradient: "linear-gradient(135deg, #7f0d0d, #ffd700)",
     bg: gryffindorBg,
     messages: [
-      "You’ve got the heart of a true lion, Gryffindor! Stand tall and brave!",
-      "Bravery is not the absence of fear—it’s rising above it every single time!",
-      "Dumbledore himself would beam at your courage and daring feats!",
-      "Your fire burns brighter than any spell ever cast in the darkest nights!",
-      "Even in times of shadow, courage lights the path forward!",
-      "Gryffindor roars with pride because of your unyielding spirit!",
-      "Harry salutes your fearless soul and relentless bravery!"
-    ],
+      "Good start! That bug didn’t stand a chance against you. Keep pushing — the harder it gets, the stronger you’ll grow.",
+      "Yes! Another bug falls. Don’t stop — imagine the victory at the end driving you forward.",
+      "Halfway to glory! Push harder now, because Gryffindors shine brightest under pressure.",
+      "Halfway! Don’t look back — keep fighting forward like a true lion.",
+      "Yes! Five down. You’re nearly there — keep burning with courage!",
+      "One step away from victory. Give it everything you’ve got!",
+      "You did it! This is what courage and determination look like — be proud."
+    ]
   },
   Slytherin: {
     name: "Draco Malfoy",
@@ -34,14 +34,14 @@ const houseCharacters = {
     gradient: "linear-gradient(135deg, #1A472A, #C0C0C0)",
     bg: slytherinBg,
     messages: [
-      "Ambition shapes your destiny—Slytherin, rise with cunning and pride!",
-      "Every clever move you make paves the path to greatness!",
-      "Cunning minds like yours bend fate with sharp wit and resolve!",
-      "Your strength of character proves that Slytherins always triumph!",
-      "Salazar himself would admire your skill and clever determination!",
-      "The serpent coils with pride at your relentless drive and ambition!",
-      "Victory favors the bold and clever, just like you today!"
-    ],
+       "One down and you already look proud? Pathetic. Let’s see if you crawl past the next one.",
+       "Managed another? Don’t get too excited — even trolls can smash through easy bugs.",
+       "Still clinging on? I almost admire it. But don’t mistake persistence for actual skill.",
+      "Halfway, and you look like you’ve run a marathon. Are you even cut out for this?",
+      "Five down. Impressive… for a first-year. Real Slytherins would’ve finished long ago.",
+      "Nearly done, but don’t celebrate yet. I’d hate to watch you choke at the very end.",
+      "Well, well… you actually survived. I’ll admit, I didn’t think you had it in you. Don’t let it go to your head."
+    ]
   },
   Ravenclaw: {
     name: "Luna Lovegood",
@@ -49,28 +49,33 @@ const houseCharacters = {
     gradient: "linear-gradient(135deg, #0E1A40, #CD7F32)",
     bg: ravenclawBg,
     messages: [
-      "Loyalty, kindness, and dedication define a true Hufflepuff!",
-      "Hard work is the strongest form of magic, and you wield it well!",
-      "Hufflepuffs stand tall, fair, and brave, just like you today!",
-      "Dedication and patience have brought you to this shining moment!",
-      "Even Helga herself would smile at your unwavering spirit!",
-      "Your fairness and courage inspire everyone around you!",
-      "The badger nods with pride because your heart shines brightly!"
-    ],
+      "Lovely! That bug fluttered away like a Nargle. Strange things unravel when you notice patterns, keep noticing.",
+      "Two bugs gone! It’s like unraveling a tapestry; each thread reveals the whole picture.",
+      "Three is such a magical number, don’t you think? Patterns are aligning, trust your instincts.",
+      "Four solved. It’s almost like the puzzle wanted to be your friend all along.",
+      "Five feels balanced, like the stars aligning. Keep reaching for what’s just out of sight.",
+      "Six is a curious number, it wobbles a bit — don’t let your focus wobble with it.",
+      "How wonderful… the last bug slipped away like a dream fading at dawn. But you caught it! Brilliant!"
+    ]
   },
   Hufflepuff: {
     name: "Cedric Diggory",
     img: cedricImg,
-    gradient: "linear-gradient(135deg, #FFDB58, #000000)",
+    gradient: "linear-gradient(135deg, #FFDB58, #635555ff)", // yellow + black
     bg: hufflepuffBg,
     messages: [
-      "Loyalty, kindness, and dedication define a true Hufflepuff!",
-      "Hard work is the strongest form of magic, and you wield it well!",
-      "Hufflepuffs stand tall, fair, and brave, just like you today!",
-    ],
-  },
+      "Solid work. Stay steady — consistency will win this round, not just speed.",
+      "Nice progress. Remember, pace yourself — the cleverest coder balances focus with calm.",
+      "That’s real progress. Keep your mind clear — the toughest challenges are yet to come.",
+      "Strong work. Stay grounded — don’t let pressure cloud your judgment now.",
+      "Excellent. This is where many stumble — stay calm, keep steady.",
+      "Nearly there. Don’t rush, precision matters more than speed now.",
+      "Well done! You’ve proven focus and resilience win the day. Be proud of your steady climb."
+    ]
+  }
 };
 
+// Animation variants for word fade-in
 const container = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.05 } },

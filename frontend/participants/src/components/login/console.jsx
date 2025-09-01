@@ -130,8 +130,14 @@ export default function WizardIDE() {
     <div className={`wizard-ide ${theme}`}>
       <div className="topbar">
         <h2>
-          Wizard IDE 🪄 – {theme} | Question {questionNumber}
+          Wizard IDE  – {theme} | Question {questionNumber}
         </h2>
+        <button 
+          className="back-btn" 
+          onClick={() => navigate(`/${theme.toLowerCase()}/map`)}  // ✅ navigate back to map
+        >
+          ⬅ Back
+          </button>
       </div>
 
       <div className="monaco-editor-container">
