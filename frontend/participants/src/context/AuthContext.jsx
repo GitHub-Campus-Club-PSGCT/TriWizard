@@ -4,7 +4,7 @@ import axios from "axios";
 const AuthContext = createContext();
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080",
+  baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:8080",
   withCredentials: true,
 });
 
@@ -15,16 +15,22 @@ export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
 
   const fetchUser = useCallback(async () => {
+    console.log("🔍 Fetching user authentication status...");
     try {
       const res = await api.get("/api/auth/me");
+      console.log("📡 Auth API response:", res.data);
+      
       if (res.data?.success) {
+        console.log("✅ User authenticated:", res.data.user);
         setUser(res.data.user); // ✅ The user object is { rollNumber, houseName }
         setIsLoggedIn(true);
       } else {
+        console.log("❌ User not authenticated - API returned success:false");
         setUser(null);
         setIsLoggedIn(false);
       }
-    } catch {
+    } catch (error) {
+      console.log("💥 Auth API error:", error.response?.status, error.response?.data);
       setUser(null);
       setIsLoggedIn(false);
     } finally {
