@@ -17,6 +17,7 @@ export default function WizardIDE() {
   const [testCasesPassed, setTestCasesPassed] = useState(0);
   const [testCasesTotal, setTestCasesTotal] = useState(0);
   const [submissionResults, setSubmissionResults] = useState([]);
+  const [isRunning, setIsRunning] = useState(false); // ✅ Loading state for run button
   const navigate = useNavigate();
   // 🔹 Number-to-theme mapping
   const themeMap = {
@@ -86,6 +87,10 @@ export default function WizardIDE() {
       return;
     }
 
+    setIsRunning(true); // ✅ Start loading
+    setOutput("Running your code..."); // ✅ Show loading message
+    setSubmissionResults([]); // ✅ Clear previous results
+
     try {
       const res = await fetch(`${API_URL}/submission`, {
         method: "POST",
@@ -123,6 +128,8 @@ export default function WizardIDE() {
     } catch (err) {
       setOutput("⚠ Error connecting to backend");
       console.error(err);
+    } finally {
+      setIsRunning(false); // ✅ Stop loading
     }
   };
 
@@ -152,18 +159,29 @@ export default function WizardIDE() {
       </div>
 
       <div className="content-container">
-        <button className="run-btn" onClick={runCode}>
-          ▶ Run
+        <button 
+          className="run-btn" 
+          onClick={runCode}
+          disabled={isRunning}
+        >
+          {isRunning ? "Running..." : "▶ Run"}
         </button>
 
         {/* Test Cases Passed Summary */}
-        {testCasesTotal > 0 && (
-          <div className="testcase-summary">
-            <h3>Test Cases: {testCasesPassed}/{testCasesTotal} Passed</h3>
+        {isRunning ? (
+          <div className="loading-results">
+            <h3>Processing your submission...</h3>
+            <p>Please wait while we test your code against all test cases.</p>
           </div>
+        ) : (
+          testCasesTotal > 0 && (
+            <div className="testcase-summary">
+              <h3>Test Cases: {testCasesPassed}/{testCasesTotal} Passed</h3>
+            </div>
+          )
         )}
 
-        {testCases.length > 0 && (
+        {testCases.length > 0 && !isRunning && (
           <div className="testcase-box">
             <h3>Test Cases</h3>
             {testCases.map((tc, i) => (
@@ -185,7 +203,14 @@ export default function WizardIDE() {
         
         <div className="output">
           <h3>Your Output</h3>
-          <pre>{output}</pre>
+          {isRunning ? (
+            <div className="loading-output">
+              <p>Executing your code...</p>
+              <p>This may take a few seconds.</p>
+            </div>
+          ) : (
+            <pre>{output}</pre>
+          )}
         </div>
       </div>
     </div>
