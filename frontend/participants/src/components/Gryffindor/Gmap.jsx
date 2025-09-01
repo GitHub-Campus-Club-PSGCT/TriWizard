@@ -23,7 +23,7 @@ const GMapPage = () => {
           <Link to="/rules">
             <button>Rules</button>
           </Link>
-          <Link to="/leaderboard">
+          <Link to="/ld">
             <button>Leaderboard</button>
           </Link>
         </div>
