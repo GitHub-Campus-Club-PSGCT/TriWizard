@@ -18,6 +18,8 @@ export default function WizardIDE() {
   const [testCasesTotal, setTestCasesTotal] = useState(0);
   const [submissionResults, setSubmissionResults] = useState([]);
   const [isRunning, setIsRunning] = useState(false); // ✅ Loading state for run button
+  const [isSubmittedCode, setIsSubmittedCode] = useState(false); // ✅ Track if showing submitted code
+  const [questionDescription, setQuestionDescription] = useState(""); // ✅ Store question description
   const navigate = useNavigate();
   // 🔹 Number-to-theme mapping
   const themeMap = {
@@ -49,32 +51,61 @@ export default function WizardIDE() {
     fetchTeamId();
   }, []);
 
+  // 🔹 Function to reset to original buggy code
+  const resetToOriginalCode = async () => {
+    if (!teamId || !questionId) return;
+    
+    try {
+      // Fetch the original buggy code without teamId to get fresh question
+      const res = await fetch(
+        `${API_URL}/questions/${themeMap[housename] || housename}/${questionNumber}`
+      );
+      const data = await res.json();
+
+      if (data && data.success && data.question) {
+        setCode(data.question.buggedCode || "// No buggy code found");
+        setIsSubmittedCode(false);
+      }
+    } catch (err) {
+      console.error("Error resetting to original code:", err);
+    }
+  };
+
+  // 🔹 Function to fetch code (extracted for reuse)
+  const fetchCode = async () => {
+    if (!teamId) return; // Wait for teamId to be available
+    
+    try {
+      const res = await fetch(
+        `${API_URL}/questions/${themeMap[housename] || housename}/${questionNumber}?teamId=${teamId}`
+      );
+      const data = await res.json();
+      //for bebugging
+      console.log(data)
+      if (data && data.success && data.question) {
+        setCode(data.question.code || data.question.buggedCode || "// No code found");
+        setTestCases(data.question.testCases || []);
+        setQuestionId(data.question._id); // ✅ save questionId
+        setQuestionDescription(data.question.questionDescription || ""); // ✅ save question description
+        
+        // ✅ Check if we're showing submitted code or original buggy code
+        setIsSubmittedCode(data.question.code !== data.question.buggedCode);
+      } else {
+        setCode("// ⚠ No code found for this question.");
+        setIsSubmittedCode(false);
+        setQuestionDescription("");
+      }
+    } catch (err) {
+      setCode("// ⚠ Error fetching code.");
+      console.error(err);
+    }
+  };
+
   // 🔹 Fetch buggy code & testcases
   useEffect(() => {
     setTheme(themeMap[housename] || housename);
-
-    const fetchBuggyCode = async () => {
-      try {
-        const res = await fetch(
-          `${API_URL}/questions/${themeMap[housename] || housename}/${questionNumber}`
-        );
-        const data = await res.json();
-
-        if (data && data.success && data.question) {
-          setCode(data.question.buggedCode || "// No buggy code found");
-          setTestCases(data.question.testCases || []);
-          setQuestionId(data.question._id); // ✅ save questionId
-        } else {
-          setCode("// ⚠ No buggy code found for this question.");
-        }
-      } catch (err) {
-        setCode("// ⚠ Error fetching buggy code.");
-        console.error(err);
-      }
-    };
-
-    fetchBuggyCode();
-  }, [housename, questionNumber]);
+    fetchCode();
+  }, [housename, questionNumber, teamId]); // ✅ Added teamId dependency
 
   // 🔹 Run code by sending to backend
   const runCode = async () => {
@@ -111,6 +142,11 @@ export default function WizardIDE() {
         setTestCasesTotal(data.testcasesTotal || 0);
         setSubmissionResults(data.submission.results || []);
         
+        // ✅ Refresh the code after submission to get the latest submitted version
+        setTimeout(() => {
+          fetchCode();
+        }, 500); // Small delay to ensure submission is saved
+        
       if (data.submission.passedAll) {
         navigate(`/dialogue/${theme}`); // theme is Gryffindor/Hufflepuff/etc.
       }
@@ -138,6 +174,9 @@ export default function WizardIDE() {
       <div className="topbar">
         <h2>
           Wizard IDE  – {theme} | Question {questionNumber}
+          {isSubmittedCode && (
+            <span className="code-status"> (Your Last Submission)</span>
+          )}
         </h2>
         <button 
           className="back-btn" 
@@ -146,6 +185,14 @@ export default function WizardIDE() {
           ⬅ Back
           </button>
       </div>
+
+      {/* Question Description Section */}
+      {questionDescription && (
+        <div className="question-description">
+          <h3>Problem Description</h3>
+          <p>{questionDescription}</p>
+        </div>
+      )}
 
       <div className="monaco-editor-container">
         <Editor
@@ -159,13 +206,25 @@ export default function WizardIDE() {
       </div>
 
       <div className="content-container">
-        <button 
-          className="run-btn" 
-          onClick={runCode}
-          disabled={isRunning}
-        >
-          {isRunning ? "Running..." : "▶ Run"}
-        </button>
+        <div className="button-row">
+          <button 
+            className="run-btn" 
+            onClick={runCode}
+            disabled={isRunning}
+          >
+            {isRunning ? "Running..." : "▶ Run"}
+          </button>
+          
+          {isSubmittedCode && (
+            <button 
+              className="reset-btn" 
+              onClick={resetToOriginalCode}
+              disabled={isRunning}
+            >
+              🔄 Reset to Original
+            </button>
+          )}
+        </div>
 
         {/* Test Cases Passed Summary */}
         {isRunning ? (
