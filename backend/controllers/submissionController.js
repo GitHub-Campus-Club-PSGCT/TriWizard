@@ -98,7 +98,7 @@ const createSubmission = async (req, res) => {
         team.score = team.score + (Math.max((testcasesPassed - old_testcases_passed), 0) * points_per_testcase);
         await team.save();
 
-        broadcastLeaderboard();
+        //broadcastLeaderboard();
       }
     }
 
