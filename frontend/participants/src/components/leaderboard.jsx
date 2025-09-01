@@ -28,6 +28,10 @@ export default function Leaderboard() {
     return () => ws.close();
   }, []);
 
+  const handleGoBack = () => {
+    window.history.back();
+  };
+
   return (
     <div className="leaderboard">
       {/* Flying Snitches */}
@@ -35,8 +39,15 @@ export default function Leaderboard() {
       <div className="snitch-container snitch-2"><Snitch /></div>
       <div className="snitch-container snitch-3"><Snitch /></div>
 
-      <h1 className="main-title">Triwizard Tournament Leaderboard 🪄</h1>
-      <p className="status online">The Tournament is Live!</p>
+       <div className="nav-header">
+        <button onClick={handleGoBack} className="back-button">
+          &larr; Back
+        </button>
+
+        <h1 className="main-title">&emsp;Triwizard Tournament Leaderboard </h1>
+      </div>
+      <br />
+      <br />
 
       <div className="houses">
         {houses.map((house) => (
