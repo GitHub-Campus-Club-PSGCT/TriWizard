@@ -58,12 +58,18 @@ const createSubmission = async (req, res) => {
       const response = await axios.post(`${COMPILER_URL}/submit`, requestBody, { timeout: 10000 });
       console.log(response.data); //for debugging purpose
       if (response.data.results) {
-        results = response.data.results.map(tc => ({
-          input: tc.input,
-          expectedOutput: tc.expectedOutput,
-          actualOutput: tc.actualOutput,
-          passed: tc.passed
-        }));
+        results = response.data.results.map(tc => {
+          // Remove all whitespace (spaces, tabs, newlines) for comparison
+          const normalize = str => (str || "").replace(/\s+/g, "");
+          const expected = normalize(tc.expectedOutput);
+          const actual = normalize(tc.actualOutput);
+          return {
+            input: tc.input,
+            expectedOutput: tc.expectedOutput,
+            actualOutput: tc.actualOutput,
+            passed: expected === actual
+          };
+        });
         testcasesPassed = results.filter(r => r.passed).length;
         passedAll = results.every(r => r.passed);
         submission.status = "done";
