@@ -18,7 +18,7 @@ import "./App.css";
 
 function App() {
   return (
-    <Router>
+    <Router basename="/triwizard">
       <AuthProvider>
         <Routes>
           {/* Redirect root to login */}
