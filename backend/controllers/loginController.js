@@ -8,9 +8,9 @@ const signAuthToken = (payload) =>
 const setAuthCookie = (res, token) => {
   res.cookie("authToken", token, {
     httpOnly: true,
-    secure: false,                
-    sameSite: "None",             
-    maxAge: 5 * 60 * 60 * 1000,
+    secure: true,
+    sameSite:"None",  
+    maxAge: 5 * 60 * 60 * 1000,     // 5 hours
   });
 };
 

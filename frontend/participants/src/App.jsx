@@ -23,17 +23,51 @@ function App() {
           <Route path="/login" element={<Login />} />
 
           {/* Protected routes */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/ide" element={<WizardIDE />} />
-            <Route path="/hufflepuff/map" element={<Hmap />} />
-            <Route path="/gryffindor/map" element={<Gmap />} />
-            <Route path="/slytherin/map" element={<Smap />} />
-            <Route path="/ravenclaw/map" element={<Rmap />} />
-            <Route path="/ide/:housename/:questionNumber" element={<WizardIDE />} />
-            <Route path="/ld" element={<Leaderboard />} />
-            <Route path="/rules" element={<Rules />} />
-            <Route path="/dialogue/:house" element={<DialoguePage />}/>
-          </Route>
+          <Route path="/ide" element={
+            <ProtectedRoute>
+              <WizardIDE />
+            </ProtectedRoute>
+          } />
+          <Route path="/hufflepuff/map" element={
+            <ProtectedRoute>
+              <Hmap />
+            </ProtectedRoute>
+          } />
+          <Route path="/gryffindor/map" element={
+            <ProtectedRoute>
+              <Gmap />
+            </ProtectedRoute>
+          } />
+          <Route path="/slytherin/map" element={
+            <ProtectedRoute>
+              <Smap />
+            </ProtectedRoute>
+          } />
+          <Route path="/ravenclaw/map" element={
+            <ProtectedRoute>
+              <Rmap />
+            </ProtectedRoute>
+          } />
+          <Route path="/ide/:housename/:questionNumber" element={
+            <ProtectedRoute>
+              <WizardIDE />
+            </ProtectedRoute>
+          } />
+          <Route path="/ld" element={
+            <ProtectedRoute>
+              <Leaderboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/rules" element={
+            <ProtectedRoute>
+              <Rules />
+            </ProtectedRoute>
+          } />
+          <Route path="/dialogue/:house" element={
+            <ProtectedRoute>
+              <DialoguePage />
+            </ProtectedRoute>
+          } />
         </Routes>
       </AuthProvider>
     </Router>

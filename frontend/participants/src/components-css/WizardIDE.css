@@ -17,6 +17,47 @@
   border-bottom: 2px solid #444;
 }
 
+.topbar h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.code-status {
+  font-size: 0.8em;
+  color: var(--accent);
+  font-weight: normal;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  border: 1px solid var(--accent);
+}
+
+/* Question Description */
+.question-description {
+  margin: 12px;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.question-description h3 {
+  margin: 0 0 12px 0;
+  color: var(--accent);
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.question-description p {
+  margin: 0;
+  line-height: 1.5;
+  white-space: pre-wrap; /* Preserve line breaks if any */
+}
+
 /* Monaco Editor Container */
 .monaco-editor-container {
   margin: 12px;
@@ -63,9 +104,15 @@
   flex-shrink: 0;
 }
 
+.button-row {
+  display: flex;
+  gap: 12px;
+  margin: 12px;
+  flex-shrink: 0;
+}
+
 .run-btn {
-  margin: 0 12px 12px 12px;
-  padding: 10px;
+  padding: 10px 16px;
   background: var(--accent);
   color: var(--accent-contrast);
   border: none;
@@ -73,7 +120,61 @@
   cursor: pointer;
   font-weight: bold;
   flex-shrink: 0;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
+
+.run-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.run-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: var(--border);
+  color: var(--text);
+}
+
+.run-btn:disabled::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: loading-shimmer 2s infinite;
+}
+
+.reset-btn {
+  padding: 10px 16px;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.reset-btn:hover:not(:disabled) {
+  background: var(--panel);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.reset-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .back-btn {
   background: #6a6866;
   color: white;
@@ -135,6 +236,100 @@
   min-height: 100px;
   flex-shrink: 0;
   margin-bottom: 24px;
+}
+
+/* Loading States */
+.loading-results,
+.loading-output {
+  margin: 12px;
+  padding: 20px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-results::before,
+.loading-output::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: loading-shimmer 2s infinite;
+}
+
+.loading-results h3,
+.loading-output p {
+  color: var(--text);
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.loading-results p {
+  color: var(--text);
+  opacity: 0.8;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* Spinner Animation */
+.loading-results h3::before,
+.loading-output p:first-child::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--accent);
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+}
+
+/* Keyframe Animations */
+@keyframes loading-shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Pulsing effect for loading text */
+.loading-results,
+.loading-output {
+  animation: pulse 2s ease-in-out infinite;
 }
 
 /* ------------------ THEMES ------------------ */
