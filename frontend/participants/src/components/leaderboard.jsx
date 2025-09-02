@@ -15,7 +15,8 @@ export default function Leaderboard() {
   const [houses, setHouses] = useState([]);
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8080");
+    const WS_URL = import.meta.env.VITE_WS_URL || "ws://localhost:8080"; // ✅ Environment variable
+    const ws = new WebSocket(WS_URL);
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);

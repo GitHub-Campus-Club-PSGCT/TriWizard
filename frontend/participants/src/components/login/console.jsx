@@ -151,13 +151,21 @@ export default function WizardIDE() {
         navigate(`/dialogue/${theme}`); // theme is Gryffindor/Hufflepuff/etc.
       }
 
-        const resultsText = data.submission.results
+        // Only show results for first 2 test cases in output
+        const visibleResults = data.submission.results.slice(0, 2);
+        const hiddenCount = data.submission.results.length - 2;
+        
+        const resultsText = visibleResults
           .map(
             (r, i) =>
-              `Test Case ${i + 1}:\nInput: ${r.input}\nExpected: ${r.expectedOutput}\nActual: ${r.actualOutput}\nPassed: ${r.passed}\n`
+              `Test Case ${i + 1}:\nInput: ${r.input}\nExpected: ${r.expectedOutput}\nActual: ${r.actualOutput}\nPassed: ${r.passed ? '✅' : '❌'}\n`
           )
           .join("\n");
-        setOutput(resultsText);
+        
+        const hiddenText = hiddenCount > 0 ? 
+          `\n--- ${hiddenCount} Hidden Test Cases ---\nResults for hidden test cases are processed but not shown here.` : '';
+        
+        setOutput(resultsText + hiddenText);
       } else {
         setOutput("⚠ Error: submission failed.");
       }
@@ -243,7 +251,8 @@ export default function WizardIDE() {
         {testCases.length > 0 && !isRunning && (
           <div className="testcase-box">
             <h3>Test Cases</h3>
-            {testCases.map((tc, i) => (
+            {/* Show only first 2 test cases */}
+            {testCases.slice(0, 2).map((tc, i) => (
               <div key={i} className="testcase">
                 <p><b>Input:</b> {tc.input}</p>
                 <p><b>Expected Output:</b> {tc.expectedOutput}</p>
@@ -257,6 +266,14 @@ export default function WizardIDE() {
                 )}
               </div>
             ))}
+            
+            {/* Show hidden test cases count */}
+            {testCases.length > 2 && (
+              <div className="hidden-testcases">
+                <p><b>+ {testCases.length - 2} Hidden Test Cases</b></p>
+                <p className="hidden-note">These will be evaluated when you submit your code</p>
+              </div>
+            )}
           </div>
         )}
         

@@ -27,7 +27,8 @@ export default function WizardIDE() {
   }
     const fetchBuggyCode = async () => {
       try {
-        const res = await fetch(`http://localhost:8080/questions/Gryffindor/2`);
+        const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
+        const res = await fetch(`${API_BASE_URL}/questions/Gryffindor/2`);
         const data = await res.json();
 
         if (data && data.success && data.question) {
@@ -48,7 +49,8 @@ export default function WizardIDE() {
   // 🔹 Run code by sending to backend
   const runCode = async () => {
     try {
-      const res = await fetch("http://localhost:8080/run-code", {
+      const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
+      const res = await fetch(`${API_BASE_URL}/run-code`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code, housename, questionNumber }),
