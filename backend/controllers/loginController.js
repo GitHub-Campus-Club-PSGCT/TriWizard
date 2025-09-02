@@ -1,5 +1,5 @@
 const Team = require("../models/Team");
-const { sendOTPEmail } = require("../config/emailService");
+const { sendOTPEmail } = require("../config/emailservice");
 const jwt = require("jsonwebtoken");
 
 const signAuthToken = (payload) =>

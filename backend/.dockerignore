@@ -1,0 +1,43 @@
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.sample
+
+# Node modules (will be installed via npm install)
+node_modules
+
+# Git files
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Temporary files
+temp/
+tmp/
+.tmp
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
