@@ -7,8 +7,8 @@ import Editor from "@monaco-editor/react";
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default function WizardIDE() {
-  const { housename, questionNumber } = useParams(); 
-  const [theme, setTheme] = useState(""); 
+  const { housename, questionNumber } = useParams();
+  const [theme, setTheme] = useState("");
   const [code, setCode] = useState("// Loading question...");
   const [output, setOutput] = useState("Result will appear here...");
   const [testCases, setTestCases] = useState([]);
@@ -21,6 +21,20 @@ export default function WizardIDE() {
   const [isSubmittedCode, setIsSubmittedCode] = useState(false); // ✅ Track if showing submitted code
   const [questionDescription, setQuestionDescription] = useState(""); // ✅ Store question description
   const navigate = useNavigate();
+
+  const handleEditorDidMount = (editor, monaco) => {
+    editor.onDidPaste((e) => {
+      const newText = "🐍 “No Parseltongue shortcuts here… type it out, wizard!”";
+      const edit = {
+        range: e.range,
+        text: newText,
+        forceMoveMarkers: true
+      };
+      // This executes after the paste, replacing the pasted content.
+      editor.executeEdits("paste-blocker", [edit]);
+    });
+  };
+
   // 🔹 Number-to-theme mapping
   const themeMap = {
     "1": "Gryffindor",
@@ -54,7 +68,7 @@ export default function WizardIDE() {
   // 🔹 Function to reset to original buggy code
   const resetToOriginalCode = async () => {
     if (!teamId || !questionId) return;
-    
+
     try {
       // Fetch the original buggy code without teamId to get fresh question
       const res = await fetch(
@@ -74,7 +88,7 @@ export default function WizardIDE() {
   // 🔹 Function to fetch code (extracted for reuse)
   const fetchCode = async () => {
     if (!teamId) return; // Wait for teamId to be available
-    
+
     try {
       const res = await fetch(
         `${API_URL}/questions/${themeMap[housename] || housename}/${questionNumber}?teamId=${teamId}`
@@ -87,7 +101,7 @@ export default function WizardIDE() {
         setTestCases(data.question.testCases || []);
         setQuestionId(data.question._id); // ✅ save questionId
         setQuestionDescription(data.question.questionDescription || ""); // ✅ save question description
-        
+
         // ✅ Check if we're showing submitted code or original buggy code
         setIsSubmittedCode(data.question.code !== data.question.buggedCode);
       } else {
@@ -129,7 +143,7 @@ export default function WizardIDE() {
         body: JSON.stringify({
           questionId,
           teamId,
-          language: "c", 
+          language: "c",
           code,
         }),
       });
@@ -141,30 +155,30 @@ export default function WizardIDE() {
         setTestCasesPassed(data.testcasesPassed || 0);
         setTestCasesTotal(data.testcasesTotal || 0);
         setSubmissionResults(data.submission.results || []);
-        
+
         // ✅ Refresh the code after submission to get the latest submitted version
         setTimeout(() => {
           fetchCode();
         }, 500); // Small delay to ensure submission is saved
-        
-      if (data.submission.passedAll) {
-        navigate(`/dialogue/${theme}`); // theme is Gryffindor/Hufflepuff/etc.
-      }
+
+        if (data.submission.passedAll) {
+          navigate(`/dialogue/${theme}`); // theme is Gryffindor/Hufflepuff/etc.
+        }
 
         // Only show results for first 2 test cases in output
         const visibleResults = data.submission.results.slice(0, 2);
         const hiddenCount = data.submission.results.length - 2;
-        
+
         const resultsText = visibleResults
           .map(
             (r, i) =>
               `Test Case ${i + 1}:\nInput: ${r.input}\nExpected: ${r.expectedOutput}\nActual: ${r.actualOutput}\nPassed: ${r.passed ? '✅' : '❌'}\n`
           )
           .join("\n");
-        
-        const hiddenText = hiddenCount > 0 ? 
+
+        const hiddenText = hiddenCount > 0 ?
           `\n--- ${hiddenCount} Hidden Test Cases ---\nResults for hidden test cases are processed but not shown here.` : '';
-        
+
         setOutput(resultsText + hiddenText);
       } else {
         setOutput("⚠ Error: submission failed.");
@@ -186,12 +200,12 @@ export default function WizardIDE() {
             <span className="code-status"> (Your Last Submission)</span>
           )}
         </h2>
-        <button 
-          className="back-btn" 
+        <button
+          className="back-btn"
           onClick={() => navigate(`/${theme.toLowerCase()}/map`)}  // ✅ navigate back to map
         >
           ⬅ Back
-          </button>
+        </button>
       </div>
 
       {/* Question Description Section */}
@@ -209,23 +223,24 @@ export default function WizardIDE() {
           theme="vs-dark"
           value={code}
           onChange={(value) => setCode(value || "")}
+          onMount={handleEditorDidMount}
           options={{ fontSize: 14, minimap: { enabled: false }, automaticLayout: true }}
         />
       </div>
 
       <div className="content-container">
         <div className="button-row">
-          <button 
-            className="run-btn" 
+          <button
+            className="run-btn"
             onClick={runCode}
             disabled={isRunning}
           >
             {isRunning ? "Running..." : "▶ Run"}
           </button>
-          
+
           {isSubmittedCode && (
-            <button 
-              className="reset-btn" 
+            <button
+              className="reset-btn"
               onClick={resetToOriginalCode}
               disabled={isRunning}
             >
@@ -266,7 +281,7 @@ export default function WizardIDE() {
                 )}
               </div>
             ))}
-            
+
             {/* Show hidden test cases count */}
             {testCases.length > 2 && (
               <div className="hidden-testcases">
@@ -276,7 +291,7 @@ export default function WizardIDE() {
             )}
           </div>
         )}
-        
+
         <div className="output">
           <h3>Your Output</h3>
           {isRunning ? (

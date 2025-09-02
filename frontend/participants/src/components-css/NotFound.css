@@ -1,0 +1,81 @@
+.not-found-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #0c0c0a;
+    color: #f9e7cf;
+    text-align: center;
+    font-family: 'Georgia', serif;
+    padding: 2rem;
+    background-image: url('../assets/greathall.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.not-found-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1;
+}
+
+.not-found-image,
+.not-found-container h1,
+.not-found-container p,
+.not-found-container .back-to-safety-button {
+    position: relative;
+    z-index: 2;
+}
+
+.not-found-image {
+    width: 150px;
+    height: auto;
+    margin-bottom: 2rem;
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.5));
+}
+
+.not-found-container h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 3rem;
+    color: #f1b1b1;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+    margin-bottom: 1rem;
+}
+
+.not-found-container p {
+    font-size: 1.2rem;
+    max-width: 600px;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.back-to-safety-button {
+    background: #f9e79f;
+    /* light golden */
+    color: #4b0101;
+    /* deep burgundy text */
+    border: 2px solid #b9770e;
+    /* warm brown/gold border */
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.back-to-safety-button:hover {
+    background: #f7dc6f;
+    /* brighter golden on hover */
+    color: #611a15;
+    /* slightly lighter burgundy */
+    box-shadow: 0 0 20px #f9e79f;
+}
