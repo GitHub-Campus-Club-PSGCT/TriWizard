@@ -1,5 +1,5 @@
 // controllers/emailController.js
-const { sendOTPEmail, testEmailConfiguration } = require('../config/emailService');
+const { sendOTPEmail, testEmailConfiguration } = require('../config/emailservice');
 
 /**
  * Controller function to handle OTP email sending

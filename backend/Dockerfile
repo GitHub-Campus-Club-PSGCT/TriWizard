@@ -2,11 +2,31 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Define build-time arguments based on your .env file
+ARG MONGO_URI
+ARG EMAIL_USER
+ARG EMAIL_PASS
+ARG JWT_SECRET
+ARG PORT=8080
+ARG COMPILER_URL
+ARG FRONTEND_URL
+ARG ADMIN_URL
+
+# Set environment variables from build arguments
+ENV MONGO_URI=${MONGO_URI}
+ENV EMAIL_USER=${EMAIL_USER}
+ENV EMAIL_PASS=${EMAIL_PASS}
+ENV JWT_SECRET=${JWT_SECRET}
+ENV PORT=${PORT}
+ENV COMPILER_URL=${COMPILER_URL}
+ENV FRONTEND_URL=${FRONTEND_URL}
+ENV ADMIN_URL=${ADMIN_URL}
+
 COPY package*.json ./
 RUN npm install --production
 
 COPY . .
 
-EXPOSE 5000
+EXPOSE ${PORT}
 
 CMD ["npm", "start"]
