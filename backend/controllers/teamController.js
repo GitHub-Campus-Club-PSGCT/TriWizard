@@ -19,7 +19,7 @@ const createTeam = async (req, res) => {
 
     const { teamName, members } = req.body;
 
-    if (!teamName || !members ) {
+    if (!teamName || !members) {
       return res.status(400).json({ success: false, message: "Missing required fields" });
     }
 
@@ -71,9 +71,6 @@ const updateHouseByRollNumber = async (req, res) => {
   }
 };
 
-module.exports = { updateHouseByRollNumber };
-
-
 // Get Teams by House Name
 const getTeamsByHouse = async (req, res) => {
   try {
@@ -123,10 +120,10 @@ const updateTeamScoreByRollNumber = async (req, res) => {
     team.score = (team.score || 0) + scoreChange;
     await team.save();
 
-    res.json({ 
-      success: true, 
-      message: `Team ${team.teamName} score updated by ${scoreChange}. New score: ${team.score}`, 
-      team 
+    res.json({
+      success: true,
+      message: `Team ${team.teamName} score updated by ${scoreChange}. New score: ${team.score}`,
+      team
     });
   } catch (error) {
     console.error(error);
@@ -137,15 +134,17 @@ const getTeamIdByEmail = async (req, res) => {
   try {
     const { email } = req.body;
 
-    if (!email || email.length < 6) {
+    if (!email || !email.includes('@')) {
       return res.status(400).json({ success: false, message: "Valid email required" });
     }
 
-    // Extract first 6 characters as roll number
-    const rollNumber = email.slice(0, 6);
+    // Extract username part of the email
+    const rollNumber = email.split('@')[0];
 
-    // Find the team containing this roll number
-    const team = await Team.findOne({ "members.rollNumber": rollNumber });
+    // Find the team containing this roll number, case-insensitively
+    const team = await Team.findOne({
+      members: { $elemMatch: { rollNumber: { $regex: new RegExp(`^${rollNumber}$`, 'i') } } }
+    });
 
     if (!team) {
       return res.status(404).json({ success: false, message: "Team not found for this roll number" });
@@ -160,5 +159,5 @@ const getTeamIdByEmail = async (req, res) => {
 };
 
 // 👇 Export ALL
-module.exports = { createTeam, updateHouseByRollNumber, getTeamsByHouse, updateTeamScoreByRollNumber,getTeamIdByEmail };
+module.exports = { createTeam, updateHouseByRollNumber, getTeamsByHouse, updateTeamScoreByRollNumber, getTeamIdByEmail };
 

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Editor from "@monaco-editor/react";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -195,14 +196,14 @@ export default function WizardIDE() {
     <div className={`wizard-ide ${theme}`}>
       <div className="topbar">
         <h2>
-          Wizard IDE  – {theme} | Question {questionNumber}
+          Wizard IDE – {theme} | Question {questionNumber}
           {isSubmittedCode && (
             <span className="code-status"> (Your Last Submission)</span>
           )}
         </h2>
         <button
           className="back-btn"
-          onClick={() => navigate(`/${theme.toLowerCase()}/map`)}  // ✅ navigate back to map
+          onClick={() => navigate(`/${theme.toLowerCase()}/map`)} // ✅ navigate back to map
         >
           ⬅ Back
         </button>
@@ -216,94 +217,99 @@ export default function WizardIDE() {
         </div>
       )}
 
-      <div className="monaco-editor-container">
-        <Editor
-          height="400px"
-          defaultLanguage="c"
-          theme="vs-dark"
-          value={code}
-          onChange={(value) => setCode(value || "")}
-          onMount={handleEditorDidMount}
-          options={{ fontSize: 14, minimap: { enabled: false }, automaticLayout: true }}
-        />
-      </div>
-
-      <div className="content-container">
-        <div className="button-row">
-          <button
-            className="run-btn"
-            onClick={runCode}
-            disabled={isRunning}
-          >
-            {isRunning ? "Running..." : "▶ Run"}
-          </button>
-
-          {isSubmittedCode && (
-            <button
-              className="reset-btn"
-              onClick={resetToOriginalCode}
-              disabled={isRunning}
-            >
-              🔄 Reset to Original
-            </button>
-          )}
-        </div>
-
-        {/* Test Cases Passed Summary */}
-        {isRunning ? (
-          <div className="loading-results">
-            <h3>Processing your submission...</h3>
-            <p>Please wait while we test your code against all test cases.</p>
+      <PanelGroup direction="vertical">
+        <Panel defaultSize={60} minSize={20} id="editor-panel">
+          <div className="monaco-editor-container" style={{ height: '100%', margin: 0 }}>
+            <Editor
+              defaultLanguage="c"
+              theme="vs-dark"
+              value={code}
+              onChange={(value) => setCode(value || "")}
+              onMount={handleEditorDidMount}
+              options={{ fontSize: 14, minimap: { enabled: false }, automaticLayout: true }}
+            />
           </div>
-        ) : (
-          testCasesTotal > 0 && (
-            <div className="testcase-summary">
-              <h3>Test Cases: {testCasesPassed}/{testCasesTotal} Passed</h3>
+        </Panel>
+        <PanelResizeHandle />
+        <Panel defaultSize={40} minSize={20} id="content-panel">
+          <div className="content-container">
+            <div className="button-row">
+              <button
+                className="run-btn"
+                onClick={runCode}
+                disabled={isRunning}
+              >
+                {isRunning ? "Running..." : "▶ Run"}
+              </button>
+
+              {isSubmittedCode && (
+                <button
+                  className="reset-btn"
+                  onClick={resetToOriginalCode}
+                  disabled={isRunning}
+                >
+                  🔄 Reset to Original
+                </button>
+              )}
             </div>
-          )
-        )}
 
-        {testCases.length > 0 && !isRunning && (
-          <div className="testcase-box">
-            <h3>Test Cases</h3>
-            {/* Show only first 2 test cases */}
-            {testCases.slice(0, 2).map((tc, i) => (
-              <div key={i} className="testcase">
-                <p><b>Input:</b> {tc.input}</p>
-                <p><b>Expected Output:</b> {tc.expectedOutput}</p>
-                {submissionResults[i] && (
-                  <p><b>Actual Output:</b> {submissionResults[i].actualOutput}</p>
-                )}
-                {submissionResults[i] && (
-                  <p><b>Status:</b> <span className={submissionResults[i].passed ? 'passed' : 'failed'}>
-                    {submissionResults[i].passed ? '✅ Passed' : '❌ Failed'}
-                  </span></p>
-                )}
+            {/* Test Cases Passed Summary */}
+            {isRunning ? (
+              <div className="loading-results">
+                <h3>Processing your submission...</h3>
+                <p>Please wait while we test your code against all test cases.</p>
               </div>
-            ))}
+            ) : (
+              testCasesTotal > 0 && (
+                <div className="testcase-summary">
+                  <h3>Test Cases: {testCasesPassed}/{testCasesTotal} Passed</h3>
+                </div>
+              )
+            )}
 
-            {/* Show hidden test cases count */}
-            {testCases.length > 2 && (
-              <div className="hidden-testcases">
-                <p><b>+ {testCases.length - 2} Hidden Test Cases</b></p>
-                <p className="hidden-note">These will be evaluated when you submit your code</p>
+            {testCases.length > 0 && !isRunning && (
+              <div className="testcase-box">
+                <h3>Test Cases</h3>
+                {/* Show only first 2 test cases */}
+                {testCases.slice(0, 2).map((tc, i) => (
+                  <div key={i} className="testcase">
+                    <p><b>Input:</b> {tc.input}</p>
+                    <p><b>Expected Output:</b> {tc.expectedOutput}</p>
+                    {submissionResults[i] && (
+                      <p><b>Actual Output:</b> {submissionResults[i].actualOutput}</p>
+                    )}
+                    {submissionResults[i] && (
+                      <p><b>Status:</b> <span className={submissionResults[i].passed ? 'passed' : 'failed'}>
+                        {submissionResults[i].passed ? '✅ Passed' : '❌ Failed'}
+                      </span></p>
+                    )}
+                  </div>
+                ))}
+
+                {/* Show hidden test cases count */}
+                {testCases.length > 2 && (
+                  <div className="hidden-testcases">
+                    <p><b>+ {testCases.length - 2} Hidden Test Cases</b></p>
+                    <p className="hidden-note">These will be evaluated when you submit your code</p>
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        )}
 
-        <div className="output">
-          <h3>Your Output</h3>
-          {isRunning ? (
-            <div className="loading-output">
-              <p>Executing your code...</p>
-              <p>This may take a few seconds.</p>
+            <div className="output">
+              <h3>Your Output</h3>
+              {isRunning ? (
+                <div className="loading-output">
+                  <p>Executing your code...</p>
+                  <p>This may take a few seconds.</p>
+                </div>
+              ) : (
+                <pre>{output}</pre>
+              )}
             </div>
-          ) : (
-            <pre>{output}</pre>
-          )}
-        </div>
-      </div>
+          </div>
+        </Panel>
+      </PanelGroup>
     </div>
   );
 }

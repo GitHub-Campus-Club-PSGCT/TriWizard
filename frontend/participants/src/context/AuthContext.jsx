@@ -12,14 +12,14 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   // No need to sync localStorage here, fetchUser is the source of truth
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const fetchUser = useCallback(async () => {
     console.log("🔍 Fetching user authentication status...");
     try {
       const res = await api.get("/api/auth/me");
       console.log("📡 Auth API response:", res.data);
-      
+
       if (res.data?.success) {
         console.log("✅ User authenticated:", res.data.user);
         setUser(res.data.user); // ✅ The user object is { rollNumber, houseName }
@@ -47,17 +47,24 @@ export function AuthProvider({ children }) {
     try {
       const res = await api.post("/api/auth/otp-verify", { rollNumber, otp });
       if (res.data?.success) {
-        setUser(res.data.user); // Set user from the successful login response
+        // Create proper user object from response
+        setUser({
+          rollNumber: res.data.rollNumber,
+          houseName: res.data.houseName
+        });
         setIsLoggedIn(true);
-        return res.data; // Return the full response to the component
+        return res.data; // Return the full response
       }
+      // If success is false or data is missing, treat as failure
+      setUser(null);
+      setIsLoggedIn(false);
       return null;
     } catch (err) {
       console.error("Login failed", err);
       setUser(null);
       setIsLoggedIn(false);
       // Re-throw or return error info so the component can handle it
-      throw err; 
+      throw err;
     }
   }
 

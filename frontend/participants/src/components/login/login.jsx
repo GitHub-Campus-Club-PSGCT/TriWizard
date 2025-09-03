@@ -43,7 +43,7 @@ const SnitchDetailsModal = ({ onClose }) => (
 );
 
 export default function Login() {
-  const { login, isLoggedIn, user } = useAuth(); 
+  const { login, isLoggedIn, user, setUser, setIsLoggedIn } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -55,7 +55,7 @@ export default function Login() {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   // ⭐ If already logged in, skip login flow
-   useEffect(() => {
+  useEffect(() => {
     if (isLoggedIn && user) {
       setAssignedHouse(user.houseName);
       setStep(STEPS.SUCCESS);
@@ -93,7 +93,7 @@ export default function Login() {
     }
 
     const rollNumber = savedEmail.split("@")[0].toLowerCase();
-console.log("Attempting to verify with Roll Number:", rollNumber);
+    console.log("Attempting to verify with Roll Number:", rollNumber);
     try {
       const res = await login(rollNumber, enteredOtp);
       console.log("Login response:", res.success);
@@ -101,7 +101,7 @@ console.log("Attempting to verify with Roll Number:", rollNumber);
 
 
       if (res?.success) {
-        setAssignedHouse(res.houseName);
+        setAssignedHouse(res.houseName); // Access houseName directly from res
         setStep(STEPS.SUCCESS);
       } else {
         // This case should ideally not be hit if login throws an error
@@ -207,7 +207,7 @@ console.log("Attempting to verify with Roll Number:", rollNumber);
             </p>
             <button
               className="btn success-btn"
-              onClick={() =>navigate(`/${assignedHouse.toLowerCase()}/map`)}
+              onClick={() => navigate(`/${assignedHouse.toLowerCase()}/map`)}
             >
               Enter the Trial
             </button>
