@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/triwizard/assets/(.*)",
+      "destination": "/assets/$1"
+    },
+    {
+      "source": "/triwizard/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
