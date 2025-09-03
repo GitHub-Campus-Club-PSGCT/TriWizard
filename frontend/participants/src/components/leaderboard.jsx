@@ -13,20 +13,46 @@ const Snitch = React.memo(() => (
 
 export default function Leaderboard() {
   const [houses, setHouses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
+
+  // Fetch leaderboard data from REST API
+  const fetchLeaderboard = async () => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+      const response = await fetch(`${API_URL}/api/leaderboard`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        setHouses(result.data);
+        setLastUpdated(new Date(result.timestamp));
+        setError(null);
+      } else {
+        throw new Error(result.message || "Failed to fetch leaderboard");
+      }
+    } catch (err) {
+      console.error("Error fetching leaderboard:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const WS_URL = import.meta.env.VITE_WS_URL || "ws://localhost:8080"; // ✅ Environment variable
-    const ws = new WebSocket(WS_URL);
+    // Initial fetch
+    fetchLeaderboard();
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setHouses(data); // data is array of {houseName, teams: [...]}
-    };
+    // Poll for updates every 5 seconds
+    const interval = setInterval(fetchLeaderboard, 5000);
 
-    ws.onopen = () => console.log("Connected to WebSocket");
-    ws.onclose = () => console.log("WebSocket disconnected");
-
-    return () => ws.close();
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   const handleGoBack = () => {
@@ -49,6 +75,30 @@ export default function Leaderboard() {
       </div>
       <br />
       <br />
+
+      {/* Loading State */}
+      {loading && (
+        <div className="status">
+          <p>Loading leaderboard...</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="status offline">
+          <p>Error: {error}</p>
+          <button onClick={fetchLeaderboard} className="back-button" style={{marginTop: '10px'}}>
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* Last Updated Info */}
+      {lastUpdated && !loading && !error && (
+        <div className="status online">
+          <p>Last updated: {lastUpdated.toLocaleTimeString()}</p>
+        </div>
+      )}
 
       <div className="houses">
         {houses.map((house) => (

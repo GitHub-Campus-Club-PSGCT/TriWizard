@@ -43,6 +43,7 @@ app.use("/submission", require("./routes/submission"));
 app.use("/", require("./routes/codeRunner"));
 app.use("/", require("./routes"));
 app.use("/admin-questions", require("./routes/adminQuestions"));
+app.use("/api/leaderboard", require("./routes/leaderboard"));
 
 // // Save code
 // app.post("/submit", async (req,res)=>{
@@ -81,39 +82,39 @@ app.use("/admin-questions", require("./routes/adminQuestions"));
 // Health check
 app.get("/", (req,res)=> res.json({message: "Hello from server 🚀"}));
 
-// --- WebSocket setup ---
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+// // --- WebSocket setup ---
+// const server = http.createServer(app);
+// const wss = new WebSocket.Server({ server });
 
-// Broadcast function: send all houses and teams
-async function broadcastLeaderboard() {
-  const allTeams = await Team.find({});
-  const houses = {};
+// // Broadcast function: send all houses and teams
+// async function broadcastLeaderboard() {
+//   const allTeams = await Team.find({});
+//   const houses = {};
 
-  allTeams.forEach(team => {
-    if (!houses[team.houseName]) houses[team.houseName] = [];
-    houses[team.houseName].push({ name: team.teamName, score: team.score });
-  });
+//   allTeams.forEach(team => {
+//     if (!houses[team.houseName]) houses[team.houseName] = [];
+//     houses[team.houseName].push({ name: team.teamName, score: team.score });
+//   });
 
-  const houseArray = Object.keys(houses).map(houseName => ({
-    houseName,
-    teams: houses[houseName]
-  }));
+//   const houseArray = Object.keys(houses).map(houseName => ({
+//     houseName,
+//     teams: houses[houseName]
+//   }));
 
-  wss.clients.forEach(client => {
-    if(client.readyState === WebSocket.OPEN){
-      client.send(JSON.stringify(houseArray));
-    }
-  });
-}
+//   wss.clients.forEach(client => {
+//     if(client.readyState === WebSocket.OPEN){
+//       client.send(JSON.stringify(houseArray));
+//     }
+//   });
+// }
 
-// On WebSocket connection
-wss.on("connection", async (ws)=>{
-  console.log("WebSocket client connected");
-  await broadcastLeaderboard();
+// // On WebSocket connection
+// wss.on("connection", async (ws)=>{
+//   console.log("WebSocket client connected");
+//   await broadcastLeaderboard();
 
-  ws.on("close", ()=> console.log("WebSocket client disconnected"));
-});
+//   ws.on("close", ()=> console.log("WebSocket client disconnected"));
+// });
 
 // Optional: simulate live score updates every 5s
 /* setInterval(async ()=>{
@@ -129,6 +130,4 @@ wss.on("connection", async (ws)=>{
 
 // Start server
 const PORT = process.env.PORT || 8080;
-server.listen(PORT, ()=> console.log(`✅ Server running on http://localhost:${PORT} with WebSocket`));
-
-module.exports.broadcastLeaderboard = broadcastLeaderboard;
+app.listen(PORT, ()=> console.log(`✅ Server running on http://localhost:${PORT}`));

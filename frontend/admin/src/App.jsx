@@ -1073,7 +1073,64 @@ const handleSubmit = async () => {
 
 // Leaderboard Page
 const LeaderboardPage = ({ setCurrentRoute }) => {
-  const { teams } = useAppContext();
+  const [teams, setTeams] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
+
+  // Fetch leaderboard data from REST API
+  const fetchLeaderboard = async () => {
+    try {
+      setLoading(true);
+      const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
+      const response = await fetch(`${API_URL}/api/leaderboard`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Convert house-based data to flat team array for admin display
+        const allTeams = [];
+        result.data.forEach(house => {
+          house.teams.forEach(team => {
+            allTeams.push({
+              id: team.name, // Use team name as ID for display
+              name: team.name,
+              score: team.score,
+              houseName: house.houseName,
+              students: [{ name: `House: ${house.houseName}` }] // Placeholder for students
+            });
+          });
+        });
+        
+        setTeams(allTeams);
+        setLastUpdated(new Date(result.timestamp));
+        setError(null);
+      } else {
+        throw new Error(result.message || "Failed to fetch leaderboard");
+      }
+    } catch (err) {
+      console.error("Error fetching leaderboard:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Initial fetch
+    fetchLeaderboard();
+
+    // Poll for updates every 10 seconds (less frequent for admin)
+    const interval = setInterval(fetchLeaderboard, 10000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, []);
+
   const sortedTeams = [...teams].sort((a, b) => (b.score || 0) - (a.score || 0));
 
   return (
@@ -1084,6 +1141,33 @@ const LeaderboardPage = ({ setCurrentRoute }) => {
           <h2 className="text-3xl font-bold text-green-900 mb-2">Triwizard Tournament</h2>
           <p className="text-green-700">Current Championship Standings</p>
         </div>
+
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center mb-8">
+            <p className="text-green-700">Loading leaderboard...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="text-center mb-8">
+            <p className="text-red-600">Error: {error}</p>
+            <button 
+              onClick={fetchLeaderboard} 
+              className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* Last Updated Info */}
+        {lastUpdated && !loading && !error && (
+          <div className="text-center mb-4">
+            <p className="text-green-600 text-sm">Last updated: {lastUpdated.toLocaleTimeString()}</p>
+          </div>
+        )}
 
         <WizardCard theme="green">
           {sortedTeams.length > 0 ? (
@@ -1109,12 +1193,12 @@ const LeaderboardPage = ({ setCurrentRoute }) => {
                         <h3 className={`text-xl font-bold ${
                           index < 3 ? 'text-white' : 'text-green-900'
                         }`}>
-                          {team.name} (ID: {team.id})
+                          {team.name}
                         </h3>
                         <div className={`text-sm ${
                           index < 3 ? 'text-white/80' : 'text-green-700'
                         }`}>
-                          {team.students.map(s => s.name).join(', ')}
+                          {team.houseName || 'Unknown House'}
                         </div>
                       </div>
                     </div>
