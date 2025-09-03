@@ -20,7 +20,7 @@ export default function Leaderboard() {
   // Fetch leaderboard data from REST API
   const fetchLeaderboard = async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+      const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
       const response = await fetch(`${API_URL}/api/leaderboard`);
       
       if (!response.ok) {
