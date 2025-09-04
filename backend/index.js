@@ -129,5 +129,5 @@ app.get("/", (req,res)=> res.json({message: "Hello from server 🚀"}));
 },5000); */
 
 // Start server
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8089;
 app.listen(PORT, ()=> console.log(`✅ Server running on http://localhost:${PORT}`));

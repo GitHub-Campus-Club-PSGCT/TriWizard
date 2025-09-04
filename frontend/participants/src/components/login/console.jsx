@@ -29,11 +29,27 @@ export default function WizardIDE() {
       const edit = {
         range: e.range,
         text: newText,
-        forceMoveMarkers: true
+        forceMoveMarkers: true,
       };
       // This executes after the paste, replacing the pasted content.
       editor.executeEdits("paste-blocker", [edit]);
     });
+
+    // Disable undo (Ctrl+Z or Cmd+Z)
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyZ, () => {
+      // Do nothing
+    });
+
+    // Disable redo (Ctrl+Y or Cmd+Shift+Z)
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyY, () => {
+      // Do nothing
+    });
+    editor.addCommand(
+      monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyZ,
+      () => {
+        // Do nothing
+      }
+    );
   };
 
   // 🔹 Number-to-theme mapping
