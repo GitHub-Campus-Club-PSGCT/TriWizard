@@ -91,17 +91,45 @@ const createSubmission = async (req, res) => {
 
     await submission.save();
 
-    const points_per_testcase = 10;
-    // Update Team's testCasesPassed array
+    // Update Team's testCasesPassed array and score
     if (teamId && question.questionNumber) {
       const team = await Team.findById(teamId);
       if (team) {
-        // Ensure testCasesPassed array is size 7
-        while (team.testCasesPassed.length < 7) team.testCasesPassed.push(0);
+        // --- Time-based Score Calculation ---
+        const maxPointsPerTestCase = 20;
+        const minPointsPerTestCase = 5;
+        const decayDurationMs = 3600000; // 1 hour
+
+        // Set start time to today at 10:30 AM
+        const startTime = new Date().setHours(11, 0, 0, 0);
+        const currentTime = Date.now();
+
+        // Calculate elapsed time, capped at the decay
+        const elapsedTimeMs = Math.min(Math.max(0, currentTime - startTime), decayDurationMs);
+
+        // Calculate the decay factor (from 1 down to 0)
+        const decayFactor = 1 - (elapsedTimeMs / decayDurationMs);
+
+        // Apply linear decay to points
+        const pointsPerTestCase = minPointsPerTestCase + (maxPointsPerTestCase - minPointsPerTestCase) * decayFactor;
+
+        // --- Original Logic with Updated Scoring ---
+        while (team.testCasesPassed.length < 7) {
+          team.testCasesPassed.push(0);
+        }
+
         const qnIdx = question.questionNumber - 1;
-        const old_testcases_passed = team.testCasesPassed[qnIdx];
-        team.testCasesPassed[qnIdx] = Math.max(team.testCasesPassed[qnIdx], testcasesPassed);
-        team.score = team.score + (Math.max((testcasesPassed - old_testcases_passed), 0) * points_per_testcase);
+        const oldTestcasesPassed = team.testCasesPassed[qnIdx] || 0;
+
+        team.testCasesPassed[qnIdx] = Math.max(oldTestcasesPassed, testcasesPassed);
+
+        // Calculate score gain using the new time-dependent points
+        const newTestsPassedCount = Math.max(0, testcasesPassed - oldTestcasesPassed);
+        const scoreGain = Math.round(newTestsPassedCount * pointsPerTestCase);
+        console.log(`Score gain : ${scoreGain}`);
+
+        team.score = (team.score || 0) + scoreGain;
+
         await team.save();
 
         //broadcastLeaderboard();
