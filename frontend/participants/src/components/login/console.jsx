@@ -1,6 +1,6 @@
 import "../../components-css/WizardIDE.css";
 import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -21,7 +21,20 @@ export default function WizardIDE() {
   const [isRunning, setIsRunning] = useState(false); // ✅ Loading state for run button
   const [isSubmittedCode, setIsSubmittedCode] = useState(false); // ✅ Track if showing submitted code
   const [questionDescription, setQuestionDescription] = useState(""); // ✅ Store question description
+  const [cooldown, setCooldown] = useState(0);
   const navigate = useNavigate();
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (cooldown > 0) {
+      timerRef.current = setTimeout(() => setCooldown(cooldown - 1), 1000);
+    }
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, [cooldown]);
 
   const handleEditorDidMount = (editor, monaco) => {
     editor.onDidPaste((e) => {
@@ -149,6 +162,7 @@ export default function WizardIDE() {
       return;
     }
 
+    setCooldown(10);
     setIsRunning(true); // ✅ Start loading
     setOutput("Running your code..."); // ✅ Show loading message
     setSubmissionResults([]); // ✅ Clear previous results
@@ -253,9 +267,13 @@ export default function WizardIDE() {
               <button
                 className="run-btn"
                 onClick={runCode}
-                disabled={isRunning}
+                disabled={isRunning || cooldown > 0}
               >
-                {isRunning ? "Running..." : "▶ Run"}
+                {isRunning
+                  ? "Running..."
+                  : cooldown > 0
+                  ? `Wait ${cooldown}s`
+                  : "▶ Run"}
               </button>
 
               {isSubmittedCode && (
