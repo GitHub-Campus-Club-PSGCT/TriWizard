@@ -101,7 +101,7 @@ const createSubmission = async (req, res) => {
         const decayDurationMs = 3600000; // 1 hour
 
         // Set start time to today at 10:30 AM
-        const startTime = new Date().setHours(11, 0, 0, 0);
+        const startTime = new Date().setHours(16, 20, 0, 0);
         const currentTime = Date.now();
 
         // Calculate elapsed time, capped at the decay
